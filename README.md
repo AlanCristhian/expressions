@@ -1,7 +1,7 @@
 # expressions
 
-An experimental library that allow your define functions that do **type
-checking** with their arguments and their returned value in execution time.
+An experimental library that allow your define functions that do *type
+checking* with their arguments and their returned value in execution time.
 Also, does all that with a **declarative syntax**.
 
 For example, in the quadratic formula, the expression underneath the square
