@@ -1,6 +1,5 @@
 """A module that let you define functions with generator expressions."""
 
-from collections import abc
 import dis
 
 
