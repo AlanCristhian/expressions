@@ -4,36 +4,59 @@
 __all__ = ['Natural']
 
 
-class _NumberMeta(type):
-    """A metaclass that define mathematical operators for the class."""
+# Supose that I wish to define a vector with the below sintax:
+# >>> v = Natural**3
+# The upper expression mean that `v` is a 3-vector with Natural numbers. The 
+# _VectorMakerMeta metaclass add this feature to the `Natural` class through
+# the `_VectorMakerMeta.__pow__()` method.
+
+class _VectorMakerMeta(type):
+    """Add `NumericType**N` API interface for to make an N-vector with
+    components of `NumericType` type.
+    """
     def __init__(cls, name, bases, namespace):
         return super().__init__(name, bases, namespace)
 
     def __pow__(cls, exponent):
-        """Make an N-vector with N = exponent"""
-        assert isinstance(exponent, int)
+        """Make an N-vector of `cls` type with N = `exponent`."""
+        assert type(exponent) is int
         assert exponent > 0
 
         return cls([0 for i in range(0, exponent)])
 
 
-class _NaturalMatrix(metaclass=_NumberMeta):
-    """Add `ℕ**n` interface for vector definition. Do that by the 
-    _NumberMeta.__pow__() method. E.g.:
-    >>> v = Natural**3
-    >>> v
-    Natural([0, 0, 0])
+# Now supose that I wish to define a matrix with the sintax:
+# >> A = Natural**3*4
+# The `A` object is a matrix with 3 rows and 4 columns. The
+# `_MatrixMaker.__mul__()` method set such feature to the object created
+# with the `Natural**3` expression. In te example `Natural` is an subclass of
+# `_MatrixMaker`.
+
+class _MatrixMaker(metaclass=_VectorMakerMeta):
+    """Add `NumericType**M*N` API interface to make an MxN matrix with
+    components of `NumericType`type.
     """
     def __init__(self, argument):
-        if type(argument) is list:
-            self._array = argument
-            self._vector = True
+        self._array = argument
 
     def __getitem__(self, arg):
         return self._array.__getitem__(arg)
 
+    def __mul__(self, multiplicant):
+        assert type(multiplicant) is int
+        assert multiplicant > 0
+
+        return _MatrixMaker([self._array for j in range(0, multiplicant)])
+
+
+class _TypeMaker(_MatrixMaker):
+    """A class that have all shared behaviours of all numeric types."""
+
+
+class Natural(_TypeMaker):
+    """The set of natural numbers."""
     def __setitem__(self, key, value):
-        # ensure that the value is a natural number
+        """Ensure that the value is a natural number before set the value."""
         assert type(value) is int
         assert value > 0
 
@@ -41,20 +64,3 @@ class _NaturalMatrix(metaclass=_NumberMeta):
 
     def __repr__(self):
         return 'Natural(%s)' % repr(self._array)
-
-    def __mul__(self, multiplicant):
-        """Add `ℕ**M*N` interface for matrix definition. Do that by the 
-        _NaturalMatrix.__mul__() method. E.g.:
-        >>> A = Natural**3*3
-        >>> A
-        Natural([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
-        """
-        assert self._vector is True
-        assert type(multiplicant) is int
-        assert multiplicant > 0
-
-        return _NaturalMatrix([self._array for j in range(0, multiplicant)])
-
-
-class Natural(_NaturalMatrix):
-    ...
