@@ -1,13 +1,13 @@
 """A library that define numeric sets."""
 
 
-__all__ = ['Natural']
+__all__ = ['Object']
 
 
 # Supose that I wish to define a vector with the below sintax:
-# >>> v = Natural**3
-# The upper expression mean that `v` is a 3-vector with Natural numbers. The 
-# _VectorMakerMeta metaclass add this feature to the `Natural` class through
+# >>> v = Object**3
+# The upper expression mean that `v` is a 3-vector with Object numbers. The 
+# _VectorMakerMeta metaclass add this feature to the `Object` class through
 # the `_VectorMakerMeta.__pow__()` method.
 
 class _VectorMakerMeta(type):
@@ -26,10 +26,10 @@ class _VectorMakerMeta(type):
 
 
 # Now supose that I wish to define a matrix with the sintax:
-# >> A = Natural**3*4
+# >> A = Object**3*4
 # The `A` object is a matrix with 3 rows and 4 columns. The
 # `_MatrixMaker.__mul__()` method set such feature to the object created
-# with the `Natural**3` expression. In te example `Natural` is an subclass of
+# with the `Object**3` expression. In te example `Object` is an subclass of
 # `_MatrixMaker`.
 
 class _MatrixMaker(metaclass=_VectorMakerMeta):
@@ -53,14 +53,10 @@ class _TypeMaker(_MatrixMaker):
     """A class that have all shared behaviours of all numeric types."""
 
 
-class Natural(_TypeMaker):
-    """The set of natural numbers."""
+class Object(_TypeMaker):
+    """The most generic type."""
     def __setitem__(self, key, value):
-        """Ensure that the value is a natural number before set the value."""
-        assert type(value) is int
-        assert value > 0
-
         return self._array.__setitem__(key, value)
 
     def __repr__(self):
-        return 'Natural(%s)' % repr(self._array)
+        return 'Object(%s)' % repr(self._array)
