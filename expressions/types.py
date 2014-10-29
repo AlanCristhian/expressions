@@ -26,7 +26,7 @@ class _VectorMakerMeta(type):
 # I want to define a function that do type checking of arguments and values
 # returned. All those with generator-expressions. E.g:
 
-# >>> double = Integer(2*x for x in Integer)
+# >>> double = Object(2*x for x in Object)
 # >>> double(4)
 # 8
 
@@ -63,11 +63,16 @@ class _IterableMeta(type):
         return sender
 
 
+# Join _IterableMeta and _VectorMakerMeta
+class _IterableAndVectorMeta(_IterableMeta, _VectorMakerMeta):
+    pass
+
+
 # Third, I use the coroutine-object returned by the __iter__() method to pass
 # values in each iteration of the generator expression. Such values act like
 # funtions parameters. The generator-expression is an consumer.
 
-class _CallableMaker(metaclass=_IterableMeta):
+class _CallableMaker(metaclass=_IterableAndVectorMeta):
     def __init__(self, generator):
         self._generator = generator
         # Cache the send method of the internal coroutine. Before an
@@ -91,7 +96,7 @@ class _CallableMaker(metaclass=_IterableMeta):
 # with the `Object**3` expression. In te example `Object` is an subclass of
 # `_MatrixMaker`.
 
-class _MatrixMaker(metaclass=_VectorMakerMeta):
+class _MatrixMaker(_CallableMaker):
     """Add `NumericType**M*N` API interface to make an MxN matrix with
     components of `NumericType`type.
     """
