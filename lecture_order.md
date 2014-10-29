@@ -5,3 +5,4 @@ This library was programed like a tutorial. So, to understand how to work the
 `expressions` lybrary you should to read the source code with the below order:
 
 1. expressions/types.py
+2. expressions/functions.py
