@@ -12,7 +12,7 @@ class TestObjectType(unittest.TestCase):
         self.assertEqual(repr(v), 'Object([0, 0, 0])')
 
     def test_Object_vector_interface(self):
-        """Should define a 3-vector of natural numbers"""
+        """Should define a 3-vector of numbers"""
         u = Object**3;
         self.assertEqual(u._array, Object([0, 0, 0])._array)
 
