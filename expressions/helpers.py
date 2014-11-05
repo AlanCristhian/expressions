@@ -3,7 +3,7 @@
 import traceback
 
 
-def set_name():
+def get_name():
     """Find the name of the instance of the current class.
     Then store it in the .__name__ attribute."""
     *_, text = traceback.extract_stack()[-3]
