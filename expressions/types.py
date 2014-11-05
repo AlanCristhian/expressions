@@ -1,6 +1,294 @@
 """A library with base classes and metaclasses that let define
 numeric sets."""
 
+import functools as ft
+import itertools as it
+import types
+
+from . import helpers
+
+
+# _BINARY_LEFT_OPERATORS = {
+#     '__add__': '%s+(%s)',
+#     '__and__': '%s&(%s)',
+#     '__div__': '%s/(%s)',
+#     '__eq__': '%s==(%s)',
+#     '__floordiv__': '%s//(%s)',
+#     '__ge__': '%s>=(%s)',
+#     '__gt__': '%s>(%s)',
+#     '__le__': '%s<=(%s)',
+#     '__lshift__': '%s<<(%s)',
+#     '__lt__': '%s<(%s)',
+#     '__matmul__': '%s@(%s)',
+#     '__mod__': '%s%%(%s)',
+#     '__mul__': '%s*(%s)',
+#     '__ne__': '%s!=(%s)',
+#     '__or___': '%s|(%s)',
+#     '__pow__': '%s**(%s)',
+#     '__rshift__': '%s>>(%s)',
+#     '__sub__': '%s-(%s)',
+#     '__truediv__': '%s/(%s)',
+#     '__xor__': '%s^(%s)',
+# }
+
+# _BINARY_RIGHT_OPERATORS = {
+#     '__radd__': '(%s)+%s',
+#     '__rand__': '(%s)&%s',
+#     '__rdiv__': '(%s)/%s',
+#     '__rfloordiv__': '(%s)//%s',
+#     '__rlshift__': '(%s)<<%s',
+#     '__rmatmul__': '(%s)@%s',
+#     '__rmod__': '(%s)%%%s',
+#     '__rmul__': '(%s)*%s',
+#     '__ror___': '(%s)|%s',
+#     '__rpow__': '(%s)**%s',
+#     '__rrshift__': '(%s)>>%s',
+#     '__rsub__': '(%s)-%s',
+#     '__rtruediv__': '(%s)/%s',
+#     '__rxor__': '(%s)^%s',
+# }
+
+# _UNARY_OPERATORS = {
+#     '__invert__': '~(%s)',
+#     '__neg__': '-(%s)',
+#     '__pos__': '+(%s)',
+# }
+
+# _CALLABLE_OPERATORS = {
+#     '__abs__': 'abs(%s)',
+#     '__bool__': 'bool(%s)',
+#     '__dir__': 'dir(%s)',
+#     '__float__': 'float(%s)',
+#     '__format__': 'format(%s)',
+#     '__hash__': 'hash(%s)',
+#     '__int__': 'int(%s)',
+#     '__repr__': 'repr(%s)',
+#     '__str__': 'str(%s)',
+# }
+
+# _SPECIAL_METHODS = {   
+#     '__delattr__': 'delattr(%s,%s)',
+#     '__divmod__': 'divmod(%s,%s)',
+#     '__getattribute__': 'getattribute(%s,%s)',
+#     '__rdivmod__': 'divmod(%s,%s)',
+#     '__setattr__': 'setattr(%s,%s,%s)',
+# }
+
+
+# Make an AST with the generator expression
+# =========================================
+
+# Python have the ast module. This library have the ast.parse(source) funtion
+# that parse the source into an AST node, where source is an string. See the
+# example:
+# >>> y = (x*y for (x, y) in range(2))
+# To reuse the ast.parse funtion I need to extract the 'x*y' string from the
+# generator object.
+
+
+def _binary_left_operator(template):
+    def decorator(function):
+        def operator(self, other):
+            result = _MakeExpressionString()
+            if hasattr(other, '_expression'):
+                result._expression = template % \
+                    (self._expression, other._expression)
+            else:
+                result._expression = template % \
+                    (self._expression, str(other))
+            return result
+        return operator
+    return decorator
+
+
+def _binary_right_operator(template):
+    def decorator(function):
+        def operator(self, other):
+            result = _MakeExpressionString()
+            if hasattr(other, '_expression'):
+                result._expression = template % \
+                    (other._expression, self._expression)
+            else:
+                result._expression = template % \
+                    (str(other), self._expression)
+            return result
+        return operator
+    return decorator
+
+
+def _unary_operator(template):
+    def decorator(function):
+        def operator(self):
+            result = _MakeExpressionString()
+            result._expression = template % self._expression
+            return result
+        return operator
+    return decorator
+
+
+# !!!: maybe exists an better way to implement this behaviour
+class _MakeExpressionString:
+    """All magick methods make an string."""
+    def __init__(self, name='Unknow'):
+        self._expression = helpers.get_name() or name
+
+    @_binary_left_operator('%s+(%s)')
+    def __add__(self, other):
+        pass
+
+    @_binary_left_operator('%s&(%s)')        
+    def __and__(self, other):
+        pass
+
+    @_binary_left_operator('%s/(%s)')        
+    def __div__(self, other):
+        pass
+
+    @_binary_left_operator('%s==(%s)')        
+    def __eq__(self, other):
+        pass
+
+    @_binary_left_operator('%s//(%s)')        
+    def __floordiv__(self, other):
+        pass
+
+    @_binary_left_operator('%s>=(%s)')        
+    def __ge__(self, other):
+        pass
+
+    @_binary_left_operator('%s>(%s)')        
+    def __gt__(self, other):
+        pass
+
+    @_binary_left_operator('%s<=(%s)')        
+    def __le__(self, other):
+        pass
+
+    @_binary_left_operator('%s<<(%s)')        
+    def __lshift__(self, other):
+        pass
+
+    @_binary_left_operator('%s<(%s)')        
+    def __lt__(self, other):
+        pass
+
+    @_binary_left_operator('%s@(%s)')        
+    def __matmul__(self, other):
+        pass
+
+    @_binary_left_operator('%s%%(%s)')        
+    def __mod__(self, other):
+        pass
+
+    @_binary_left_operator('%s*(%s)')        
+    def __mul__(self, other):
+        pass
+
+    @_binary_left_operator('%s!=(%s)')        
+    def __ne__(self, other):
+        pass
+
+    @_binary_left_operator('%s|(%s)')        
+    def __or___(self, other):
+        pass
+
+    @_binary_left_operator('%s**(%s)')        
+    def __pow__(self, other):
+        pass
+
+    @_binary_left_operator('%s>>(%s)')        
+    def __rshift__(self, other):
+        pass
+
+    @_binary_left_operator('%s-(%s)')        
+    def __sub__(self, other):
+        pass
+
+    @_binary_left_operator('%s/(%s)')        
+    def __truediv__(self, other):
+        pass
+
+    @_binary_left_operator('%s^(%s)')        
+    def __xor__(self, other):
+        pass
+
+    # --------------------------------
+
+    @_binary_right_operator('(%s)+%s')
+    def __radd__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)&%s')
+    def __rand__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)/%s')
+    def __rdiv__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)//%s')
+    def __rfloordiv__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)<<%s')
+    def __rlshift__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)@%s')
+    def __rmatmul__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)%%%s')
+    def __rmod__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)*%s')
+    def __rmul__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)|%s')
+    def __ror___(self, other):
+        pass
+
+    @_binary_right_operator('(%s)**%s')
+    def __rpow__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)>>%s')
+    def __rrshift__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)-%s')
+    def __rsub__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)/%s')
+    def __rtruediv__(self, other):
+        pass
+
+    @_binary_right_operator('(%s)^%s')
+    def __rxor__(self, other):
+        pass
+
+    # --------------------------------
+
+    @_unary_operator('~(%s)')
+    def __invert__(self, other):
+        pass
+
+    @_unary_operator('-(%s)')
+    def __neg__(self, other):
+        pass
+
+    @_unary_operator('+(%s)')
+    def __pos__(self, other):
+        pass
+
+
+
+
+# Make a vector
+# =============
 
 # Supose that I wish to define a vector with the below sintax:
 # >>> v = Object**3
@@ -22,6 +310,9 @@ class _VectorMakerMeta(type):
 
         return cls([0 for i in range(0, exponent)])
 
+
+# Make a function with the generator expression
+# =============================================
 
 # I want to define a function that do type checking of arguments and values
 # returned. All those with generator-expressions. E.g:
@@ -79,6 +370,10 @@ class _CallableMaker(metaclass=_IterableAndVectorMeta):
         # investigation I found that the first expression_list in the for
         # statement everything is stored in the same place:
         self._send = self._generator.gi_frame.f_locals['.0'].send
+        self.__name__ = helpers.get_name()
+
+        self._expression = self(*(_MakeExpressionString(name)
+            for name in self._generator.gi_code.co_varnames[1:]))
 
     def __call__(self, *args):
         """Simulate a function call."""
@@ -88,6 +383,9 @@ class _CallableMaker(metaclass=_IterableAndVectorMeta):
         # avance the generator and return their value
         return next(self._generator)
 
+
+# Make a matrix
+# =============
 
 # Now supose that I wish to define a matrix with the sintax:
 # >> A = Object**3*4
@@ -101,6 +399,8 @@ class _MatrixMaker(_CallableMaker):
     components of `NumericType`type.
     """
     def __init__(self, argument):
+        if type(argument) is not list:
+            super().__init__(argument)
         self._array = argument
 
     def __getitem__(self, arg):

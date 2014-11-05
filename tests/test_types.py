@@ -1,6 +1,6 @@
 import unittest
-
-from expressions.types import _TypeMaker, _argument_sender, _CallableMaker
+from expressions.types import (_TypeMaker, _argument_sender, _CallableMaker,
+    _MakeExpressionString)
 
 
 class Test_TypeMakerType(unittest.TestCase):
@@ -50,8 +50,93 @@ class FunctionTest(unittest.TestCase):
         self.assertEqual(b, 2)
 
     def test__CallableMaker(self):
-        double = _CallableMaker(2*x for x in _CallableMaker)
+        double = _CallableMaker(x*2 for x in _TypeMaker)
         self.assertEqual(8, double(4))
+
+
+class ExpressionTest(unittest.TestCase):
+    def test_bynary_left_operators(self):
+        add = _TypeMaker(x+2 for x in _TypeMaker)
+        and_ = _TypeMaker(x&2 for x in _TypeMaker)
+        div = _TypeMaker(x/2 for x in _TypeMaker)
+        eq = _TypeMaker(x==2 for x in _TypeMaker)
+        floordiv = _TypeMaker(x//2 for x in _TypeMaker)
+        ge = _TypeMaker(x>=2 for x in _TypeMaker)
+        gt = _TypeMaker(x>2 for x in _TypeMaker)
+        le = _TypeMaker(x<=2 for x in _TypeMaker)
+        lshift = _TypeMaker(x<<2 for x in _TypeMaker)
+        lt = _TypeMaker(x<2 for x in _TypeMaker)
+        # matmul = _TypeMaker(x@2 for x in _TypeMaker)
+        mod = _TypeMaker(x%2 for x in _TypeMaker)
+        mul = _TypeMaker(x*2 for x in _TypeMaker)
+        ne = _TypeMaker(x!=2 for x in _TypeMaker)
+        # or_ = _TypeMaker(x|2 for x in _TypeMaker)
+        pow = _TypeMaker(x**2 for x in _TypeMaker)
+        rshift = _TypeMaker(x>>2 for x in _TypeMaker)
+        sub = _TypeMaker(x-2 for x in _TypeMaker)
+        truediv = _TypeMaker(x/2 for x in _TypeMaker)
+        xor = _TypeMaker(x^2 for x in _TypeMaker)
+
+        self.assertEqual(add._expression, 'x+(2)')
+        self.assertEqual(and_._expression, 'x&(2)')
+        self.assertEqual(div._expression, 'x/(2)')
+        self.assertEqual(eq._expression, 'x==(2)')
+        self.assertEqual(floordiv._expression, 'x//(2)')
+        self.assertEqual(ge._expression, 'x>=(2)')
+        self.assertEqual(gt._expression, 'x>(2)')
+        self.assertEqual(le._expression, 'x<=(2)')
+        self.assertEqual(lshift._expression, 'x<<(2)')
+        self.assertEqual(lt._expression, 'x<(2)')
+        # self.assertEqual(matmul._expression, 'x@(2)')
+        self.assertEqual(mod._expression, 'x%(2)')
+        self.assertEqual(mul._expression, 'x*(2)')
+        self.assertEqual(ne._expression, 'x!=(2)')
+        # self.assertEqual(or_._expression, 'x|(2)')
+        self.assertEqual(pow._expression, 'x**(2)')
+        self.assertEqual(rshift._expression, 'x>>(2)')
+        self.assertEqual(sub._expression, 'x-(2)')
+        self.assertEqual(truediv._expression, 'x/(2)')
+        self.assertEqual(xor._expression, 'x^(2)')
+
+    def test_bynary_right_operators(self):
+        radd = _TypeMaker(2+x for x in _TypeMaker)
+        rand = _TypeMaker(2&x for x in _TypeMaker)
+        rdiv = _TypeMaker(2/x for x in _TypeMaker)
+        rfloordiv = _TypeMaker(2//x for x in _TypeMaker)
+        rlshift = _TypeMaker(2<<x for x in _TypeMaker)
+        # rmatmul = _TypeMaker(2@x for x in _TypeMaker)
+        rmod = _TypeMaker(2%x for x in _TypeMaker)
+        rmul = _TypeMaker(2*x for x in _TypeMaker)
+        # ror_ = _TypeMaker(2|x for x in _TypeMaker)
+        rpow = _TypeMaker(2**x for x in _TypeMaker)
+        rrshift = _TypeMaker(2>>x for x in _TypeMaker)
+        rsub = _TypeMaker(2-x for x in _TypeMaker)
+        rtruediv = _TypeMaker(2/x for x in _TypeMaker)
+        rxor = _TypeMaker(2^x for x in _TypeMaker)
+
+        self.assertEqual(radd._expression, '(2)+x')
+        self.assertEqual(rand._expression, '(2)&x')
+        self.assertEqual(rdiv._expression, '(2)/x')
+        self.assertEqual(rfloordiv._expression, '(2)//x')
+        self.assertEqual(rlshift._expression, '(2)<<x')
+        # self.assertEqual(rmatmul._expression, '(2)@x')
+        self.assertEqual(rmod._expression, '(2)%x')
+        self.assertEqual(rmul._expression, '(2)*x')
+        # self.assertEqual(ror_._expression, '(2)|x')
+        self.assertEqual(rpow._expression, '(2)**x')
+        self.assertEqual(rrshift._expression, '(2)>>x')
+        self.assertEqual(rsub._expression, '(2)-x')
+        self.assertEqual(rtruediv._expression, '(2)/x')
+        self.assertEqual(rxor._expression, '(2)^x')
+
+    def test_unary_operators(self):
+        invert = _TypeMaker(~x for x in _TypeMaker)
+        neg = _TypeMaker(-x for x in _TypeMaker)
+        pos = _TypeMaker(+x for x in _TypeMaker)
+
+        self.assertEqual(invert._expression, '~(x)')
+        self.assertEqual(neg._expression, '-(x)')
+        self.assertEqual(pos._expression, '+(x)')
 
 
 if __name__ == '__main__':
