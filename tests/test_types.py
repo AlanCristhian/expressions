@@ -138,6 +138,11 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(neg._expression, '-(x)')
         self.assertEqual(pos._expression, '+(x)')
 
+    def test___name__property(self):
+        """The _TypeMaker() instance shoud have the __name__ property."""
+        named_lambda = _TypeMaker(+x for x in _TypeMaker)
+        self.assertEqual(named_lambda.__name__, 'named_lambda')
+
 
 if __name__ == '__main__':
     unittest.main()

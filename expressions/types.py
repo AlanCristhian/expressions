@@ -3,7 +3,7 @@ numeric sets."""
 
 import functools as ft
 import itertools as it
-import types
+import inspect
 
 from . import helpers
 
@@ -130,7 +130,7 @@ def _unary_operator(template):
 class _MakeExpressionString:
     """All magick methods make an string."""
     def __init__(self, name='Unknow'):
-        self._expression = helpers.get_name() or name
+        self._expression = name
 
     @_binary_left_operator('%s+(%s)')
     def __add__(self, other):
@@ -286,7 +286,6 @@ class _MakeExpressionString:
 
 
 
-
 # Make a vector
 # =============
 
@@ -370,10 +369,10 @@ class _CallableMaker(metaclass=_IterableAndVectorMeta):
         # investigation I found that the first expression_list in the for
         # statement everything is stored in the same place:
         self._send = self._generator.gi_frame.f_locals['.0'].send
-        self.__name__ = helpers.get_name()
-
-        self._expression = self(*(_MakeExpressionString(name)
+        expr_obj = self(*(_MakeExpressionString(name)
             for name in self._generator.gi_code.co_varnames[1:]))
+
+        self._expression = expr_obj._expression
 
     def __call__(self, *args):
         """Simulate a function call."""
@@ -413,5 +412,44 @@ class _MatrixMaker(_CallableMaker):
         return _MatrixMaker([self._array for j in range(0, multiplicant)])
 
 
-class _TypeMaker(_MatrixMaker):
+
+# Variables with the .__name__ property
+# =====================================
+
+def _get_outer_globals(frame, context=1):
+    """Yield all global variables in the higher (calling) frames.
+    """
+    while frame:
+        yield frame.f_globals
+        frame = frame.f_back
+
+
+class _NamedInstance(_MatrixMaker):
+    """Make an object with the __name__ property."""
+    def __init__(self, argument):
+        super().__init__(argument)
+        self._name = helpers.get_name()
+
+    # NOTE: I define the __name__ property as a method because I need to store
+    # the name after object creation. The @helpers.cached_property decorator
+    # call the __name__ method and then transform itself into a property.
+    @helpers.cached_property
+    def __name__(self):
+        """Find the name of the instance of the current class.
+        Then store it in the .__name__ attribute."""
+        # NOTE: If you use this class in the interactive IDLE shell, the 
+        # `helpers.get_name()` function return `None`. So, I find the name of
+        # the var in the global namespace of each frame.
+        if self._name is None:
+            global_variables = _get_outer_globals(inspect.currentframe())
+            for glob in global_variables:
+                for name, value in glob.items():
+                    if value is self:
+                        return name
+        else:
+            name = self._name
+            del self._name
+            return name
+
+class _TypeMaker(_NamedInstance):
     """A class that have all shared behaviours of all numeric types."""

@@ -3,14 +3,25 @@ import unittest
 from expressions import helpers
 
 
-class Test_set_name(unittest.TestCase):
-    def test_name_function(self):
-        class A:
+class Test_cached_property(unittest.TestCase):
+    def setUp(self):
+        class Object:
             def __init__(self):
-                self.__name__ = helpers.get_name()
+                self.called = False
+            @helpers.cached_property
+            def my_property(self):
+                self.called = True
+                return 'my_property'
+        self.obj = Object()
+        
+    def test_non_getted_property(self):
+        self.assertTrue('my_property' in dir(self.obj))
+        self.assertFalse(self.obj.called)
 
-        object_name = A()
-        self.assertEqual(object_name.__name__, 'object_name')
+    def test_getted_property(self):
+        self.obj.my_property
+        self.assertTrue(self.obj.called)
+        self.assertEqual(self.obj.my_property, 'my_property')
 
 
 if __name__ == '__main__':
