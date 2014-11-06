@@ -51,7 +51,7 @@ class FunctionTest(unittest.TestCase):
 
     def test__CallableMaker(self):
         double = _CallableMaker(x*2 for x in _TypeMaker)
-        self.assertEqual(8, double(4))
+        self.assertEqual(8, next(double(4)))
 
 
 class ExpressionTest(unittest.TestCase):

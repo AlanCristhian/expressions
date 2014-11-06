@@ -372,7 +372,7 @@ class _CallableMaker(metaclass=_IterableAndVectorMeta):
         expr_obj = self(*(_MakeExpressionString(name)
             for name in self._generator.gi_code.co_varnames[1:]))
 
-        self._expression = expr_obj._expression
+        self._expression = next(expr_obj)._expression
 
     def __call__(self, *args):
         """Simulate a function call."""
@@ -380,7 +380,7 @@ class _CallableMaker(metaclass=_IterableAndVectorMeta):
         for a in args:
             self._send(a)
         # avance the generator and return their value
-        return next(self._generator)
+        return self._generator
 
 
 # Make a matrix
