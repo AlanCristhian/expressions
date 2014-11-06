@@ -1,7 +1,6 @@
 """A set of utility functions."""
 
 import traceback
-import sys
 
 
 class cached_property:

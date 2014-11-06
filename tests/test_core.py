@@ -1,5 +1,5 @@
 import unittest
-from expressions.types import (_TypeMaker, _argument_sender, _CallableMaker,
+from expressions.core import (_TypeMaker, _argument_sender, _CallableMaker,
     _MakeExpressionString)
 
 

@@ -1,8 +1,8 @@
 """A module that let you define functions with generator expressions."""
-from expressions import types
+from expressions import core
 
 
-class Object(types._TypeMaker):
+class Object(core._TypeMaker):
     """The most generic type."""
     def __setitem__(self, key, value):
         return self._array.__setitem__(key, value)
