@@ -95,7 +95,7 @@ def _binary_left_operator(template):
                     (self._expression, other._expression)
             else:
                 result._expression = template % \
-                    (self._expression, str(other))
+                    (self._expression, repr(other))
             return result
         return operator
     return decorator
@@ -110,7 +110,7 @@ def _binary_right_operator(template):
                     (other._expression, self._expression)
             else:
                 result._expression = template % \
-                    (str(other), self._expression)
+                    (repr(other), self._expression)
             return result
         return operator
     return decorator
@@ -129,8 +129,12 @@ def _unary_operator(template):
 # !!!: maybe exists an better way to implement this behaviour
 class _MakeExpressionString:
     """All magick methods make an string."""
-    def __init__(self, name='Unknow'):
-        self._expression = name
+    def __init__(self, name=None):
+        if name is not None:
+            self._expression = name
+
+    def __repr__(self):
+        return self._expression
 
     @_binary_left_operator('%s+(%s)')
     def __add__(self, other):
@@ -365,14 +369,19 @@ class _IterableAndVectorMeta(_IterableMeta, _VectorMakerMeta):
 class _CallableMaker(metaclass=_IterableAndVectorMeta):
     def __init__(self, generator):
         self._generator = generator
+        self._send = self._generator.gi_frame.f_locals['.0'].send
+
+    @helpers.cached_property
+    def _expression(self):
         # Cache the send method of the internal coroutine. Before an
         # investigation I found that the first expression_list in the for
         # statement everything is stored in the same place:
-        self._send = self._generator.gi_frame.f_locals['.0'].send
         expr_obj = self(*(_MakeExpressionString(name)
             for name in self._generator.gi_code.co_varnames[1:]))
 
-        self._expression = next(expr_obj)._expression
+        obj = next(expr_obj)
+
+        return obj._expression if hasattr(obj, '_expression') else self.__name__
 
     def __call__(self, *args):
         """Simulate a function call."""
@@ -450,6 +459,39 @@ class _NamedInstance(_MatrixMaker):
             name = self._name
             del self._name
             return name
+
+    def __call__(self, *args):
+        result = super().__call__(*args)
+        return CalledObject(result, self.__name__, args)
+
+
+class CalledObject:
+    def __init__(self, generator, name, args):
+        self._generator = generator
+        self._expression = name + repr(args).replace(',)', ')')
+
+    def __iter__(self):
+        return self._generator.__iter__
+
+    def __next__(self):
+        return self._generator.__next__()
+
+    def close(self):
+        return self._generator.close()
+
+    def send(self, *args, **kwds):
+        return self._generator.send(*args, **kwds)
+
+    def throw(self):
+        return self._generator.throw()
+
+    @helpers.cached_property
+    def gi_running(self):
+        return self._generator.gi_running
+
+    def __repr__(self):
+        return self._expression
+
 
 class _TypeMaker(_NamedInstance):
     """A class that have all shared behaviours of all numeric types."""

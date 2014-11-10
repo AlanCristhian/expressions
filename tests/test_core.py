@@ -143,6 +143,12 @@ class ExpressionTest(unittest.TestCase):
         named_lambda = _TypeMaker(+x for x in _TypeMaker)
         self.assertEqual(named_lambda.__name__, 'named_lambda')
 
+    def test_CallableMaker_string(self):
+        """Should make a correct code if use some _CallableMaker object."""
+        double = _TypeMaker(x*2 for x in _TypeMaker)
+        expr = _TypeMaker(double(y) for y in _TypeMaker)
+        self.assertEqual(expr._expression, 'double(y)')
+
 
 if __name__ == '__main__':
     unittest.main()
