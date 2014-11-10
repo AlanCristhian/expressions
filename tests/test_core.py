@@ -1,35 +1,35 @@
 import unittest
-from expressions.core import (_TypeMaker, _argument_sender, _CallableMaker,
-    _MakeExpressionString)
+from expressions.core import (BaseType, argument_sender, CallableObject,
+    ExpressionString)
 
 
-class Test_TypeMakerType(unittest.TestCase):
-    def test__TypeMaker_vector(self):
-        v = _TypeMaker([0, 0, 0])
+class TestBaseTypeType(unittest.TestCase):
+    def test_BaseType_vector(self):
+        v = BaseType([0, 0, 0])
         self.assertEqual(v._array, [0, 0, 0])
 
-    def test__TypeMaker_vector_interface(self):
+    def test_BaseType_vector_interface(self):
         """Should define a 3-vector of numbers"""
-        u = _TypeMaker**3;
-        self.assertEqual(u._array, _TypeMaker([0, 0, 0])._array)
+        u = BaseType**3;
+        self.assertEqual(u._array, BaseType([0, 0, 0])._array)
 
-    def test__TypeMaker_matrix(self):
-        A = _TypeMaker([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    def test_BaseType_matrix(self):
+        A = BaseType([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         array = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertEqual(A._array, array)
 
-    def test__TypeMaker_matrix_interface(self):
-        A = _TypeMaker**3*3
+    def test_BaseType_matrix_interface(self):
+        A = BaseType**3*3
         array = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertEqual(A._array, array)
 
-    def test__TypeMaker_matrix_getitem(self):
-        A = _TypeMaker([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    def test_BaseType_matrix_getitem(self):
+        A = BaseType([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         item = A[1][2]
         self.assertEqual(item, 6)
 
-    def test_three_dimensions__TypeMaker_matrix_interface(self):
-        A = _TypeMaker**3*3*2
+    def test_three_dimensions_BaseType_matrix_interface(self):
+        A = BaseType**3*3*2
         array = [
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -38,44 +38,44 @@ class Test_TypeMakerType(unittest.TestCase):
 
 
 class FunctionTest(unittest.TestCase):
-    def test__argument_sender(self):
-        """The coroutine object created with _argument_sender should
+    def test_argument_sender(self):
+        """The coroutine object created with argument_sender should
         yield the value sended and return the value again in the next
         iteration."""
-        sender = _argument_sender()
+        sender = argument_sender()
         next(sender)
         a = sender.send(2)
         b = next(sender)
         self.assertEqual(a, 2)
         self.assertEqual(b, 2)
 
-    def test__CallableMaker(self):
-        double = _CallableMaker(x*2 for x in _TypeMaker)
+    def test_CallableObject(self):
+        double = CallableObject(x*2 for x in BaseType)
         self.assertEqual(8, next(double(4)))
 
 
 class ExpressionTest(unittest.TestCase):
     def test_bynary_left_operators(self):
-        add = _TypeMaker(x+2 for x in _TypeMaker)
-        and_ = _TypeMaker(x&2 for x in _TypeMaker)
-        div = _TypeMaker(x/2 for x in _TypeMaker)
-        eq = _TypeMaker(x==2 for x in _TypeMaker)
-        floordiv = _TypeMaker(x//2 for x in _TypeMaker)
-        ge = _TypeMaker(x>=2 for x in _TypeMaker)
-        gt = _TypeMaker(x>2 for x in _TypeMaker)
-        le = _TypeMaker(x<=2 for x in _TypeMaker)
-        lshift = _TypeMaker(x<<2 for x in _TypeMaker)
-        lt = _TypeMaker(x<2 for x in _TypeMaker)
-        # matmul = _TypeMaker(x@2 for x in _TypeMaker)
-        mod = _TypeMaker(x%2 for x in _TypeMaker)
-        mul = _TypeMaker(x*2 for x in _TypeMaker)
-        ne = _TypeMaker(x!=2 for x in _TypeMaker)
-        # or_ = _TypeMaker(x|2 for x in _TypeMaker)
-        pow = _TypeMaker(x**2 for x in _TypeMaker)
-        rshift = _TypeMaker(x>>2 for x in _TypeMaker)
-        sub = _TypeMaker(x-2 for x in _TypeMaker)
-        truediv = _TypeMaker(x/2 for x in _TypeMaker)
-        xor = _TypeMaker(x^2 for x in _TypeMaker)
+        add = BaseType(x+2 for x in BaseType)
+        and_ = BaseType(x&2 for x in BaseType)
+        div = BaseType(x/2 for x in BaseType)
+        eq = BaseType(x==2 for x in BaseType)
+        floordiv = BaseType(x//2 for x in BaseType)
+        ge = BaseType(x>=2 for x in BaseType)
+        gt = BaseType(x>2 for x in BaseType)
+        le = BaseType(x<=2 for x in BaseType)
+        lshift = BaseType(x<<2 for x in BaseType)
+        lt = BaseType(x<2 for x in BaseType)
+        # matmul = BaseType(x@2 for x in BaseType)
+        mod = BaseType(x%2 for x in BaseType)
+        mul = BaseType(x*2 for x in BaseType)
+        ne = BaseType(x!=2 for x in BaseType)
+        # or_ = BaseType(x|2 for x in BaseType)
+        pow = BaseType(x**2 for x in BaseType)
+        rshift = BaseType(x>>2 for x in BaseType)
+        sub = BaseType(x-2 for x in BaseType)
+        truediv = BaseType(x/2 for x in BaseType)
+        xor = BaseType(x^2 for x in BaseType)
 
         self.assertEqual(add._expression, 'x+(2)')
         self.assertEqual(and_._expression, 'x&(2)')
@@ -99,20 +99,20 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(xor._expression, 'x^(2)')
 
     def test_bynary_right_operators(self):
-        radd = _TypeMaker(2+x for x in _TypeMaker)
-        rand = _TypeMaker(2&x for x in _TypeMaker)
-        rdiv = _TypeMaker(2/x for x in _TypeMaker)
-        rfloordiv = _TypeMaker(2//x for x in _TypeMaker)
-        rlshift = _TypeMaker(2<<x for x in _TypeMaker)
-        # rmatmul = _TypeMaker(2@x for x in _TypeMaker)
-        rmod = _TypeMaker(2%x for x in _TypeMaker)
-        rmul = _TypeMaker(2*x for x in _TypeMaker)
-        # ror_ = _TypeMaker(2|x for x in _TypeMaker)
-        rpow = _TypeMaker(2**x for x in _TypeMaker)
-        rrshift = _TypeMaker(2>>x for x in _TypeMaker)
-        rsub = _TypeMaker(2-x for x in _TypeMaker)
-        rtruediv = _TypeMaker(2/x for x in _TypeMaker)
-        rxor = _TypeMaker(2^x for x in _TypeMaker)
+        radd = BaseType(2+x for x in BaseType)
+        rand = BaseType(2&x for x in BaseType)
+        rdiv = BaseType(2/x for x in BaseType)
+        rfloordiv = BaseType(2//x for x in BaseType)
+        rlshift = BaseType(2<<x for x in BaseType)
+        # rmatmul = BaseType(2@x for x in BaseType)
+        rmod = BaseType(2%x for x in BaseType)
+        rmul = BaseType(2*x for x in BaseType)
+        # ror_ = BaseType(2|x for x in BaseType)
+        rpow = BaseType(2**x for x in BaseType)
+        rrshift = BaseType(2>>x for x in BaseType)
+        rsub = BaseType(2-x for x in BaseType)
+        rtruediv = BaseType(2/x for x in BaseType)
+        rxor = BaseType(2^x for x in BaseType)
 
         self.assertEqual(radd._expression, '(2)+x')
         self.assertEqual(rand._expression, '(2)&x')
@@ -130,23 +130,23 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(rxor._expression, '(2)^x')
 
     def test_unary_operators(self):
-        invert = _TypeMaker(~x for x in _TypeMaker)
-        neg = _TypeMaker(-x for x in _TypeMaker)
-        pos = _TypeMaker(+x for x in _TypeMaker)
+        invert = BaseType(~x for x in BaseType)
+        neg = BaseType(-x for x in BaseType)
+        pos = BaseType(+x for x in BaseType)
 
         self.assertEqual(invert._expression, '~(x)')
         self.assertEqual(neg._expression, '-(x)')
         self.assertEqual(pos._expression, '+(x)')
 
     def test___name__property(self):
-        """The _TypeMaker() instance shoud have the __name__ property."""
-        named_lambda = _TypeMaker(+x for x in _TypeMaker)
+        """The BaseType() instance shoud have the __name__ property."""
+        named_lambda = BaseType(+x for x in BaseType)
         self.assertEqual(named_lambda.__name__, 'named_lambda')
 
-    def test_CallableMaker_string(self):
-        """Should make a correct code if use some _CallableMaker object."""
-        double = _TypeMaker(x*2 for x in _TypeMaker)
-        expr = _TypeMaker(double(y) for y in _TypeMaker)
+    def testCallableObject_string(self):
+        """Should make a correct code if use some CallableObject object."""
+        double = BaseType(x*2 for x in BaseType)
+        expr = BaseType(double(y) for y in BaseType)
         self.assertEqual(expr._expression, 'double(y)')
 
 
