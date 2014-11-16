@@ -1,4 +1,4 @@
-from expressions import core
+from symbolicmath import core
 
 
 def solve_single_equality(equality, variable):

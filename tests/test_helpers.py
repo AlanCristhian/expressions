@@ -1,6 +1,6 @@
 import unittest
 
-from expressions import helpers
+from symbolicmath import helpers
 
 
 class Test_cached_property(unittest.TestCase):

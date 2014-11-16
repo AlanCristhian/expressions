@@ -1,6 +1,6 @@
 import unittest
 
-from expressions import lazymatrix as lm
+from symbolicmath import lazymatrix as lm
 
 
 class DictVectorTest(unittest.TestCase):

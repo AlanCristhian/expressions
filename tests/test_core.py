@@ -1,5 +1,5 @@
 import unittest
-from expressions.core import (BaseType, argument_sender, CallableObject,
+from symbolicmath.core import (BaseType, argument_sender, CallableObject,
     ExpressionString)
 
 
