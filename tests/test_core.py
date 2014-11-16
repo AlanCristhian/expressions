@@ -53,6 +53,11 @@ class FunctionTest(unittest.TestCase):
         double = CallableObject(x*2 for x in BaseType)
         self.assertEqual(8, next(double(4)))
 
+    def test_many_variables(self):
+        add = BaseType(x + y for x, y in BaseType)
+        added = add(3, 4)
+        self.assertEqual(7, next(added))
+
 
 class ExpressionTest(unittest.TestCase):
     def test_bynary_left_operators(self):
