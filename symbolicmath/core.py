@@ -126,7 +126,7 @@ class ExpressionString:
         pass
 
     @binary_left_operator('%s|(%s)')        
-    def __or___(self, other):
+    def __or__(self, other):
         pass
 
     @binary_left_operator('%s**(%s)')        
@@ -184,7 +184,7 @@ class ExpressionString:
         pass
 
     @binary_right_operator('(%s)|%s')
-    def __ror___(self, other):
+    def __ror__(self, other):
         pass
 
     @binary_right_operator('(%s)**%s')
