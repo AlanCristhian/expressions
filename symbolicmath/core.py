@@ -319,8 +319,8 @@ class CallableObject(metaclass=IterableAndVectorMeta):
     def __call__(self, *args):
         """Simulate a function call."""
         # send arguments to the internal coroutine
-        for a in args:
-            self._send(a)
+        self._send(args[0]) if len(args) is 1 else self._send(args)
+
         # avance the generator and return their value
         return self._generator
 
