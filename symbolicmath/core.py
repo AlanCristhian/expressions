@@ -314,7 +314,9 @@ class CallableObject(metaclass=IterableAndVectorMeta):
 
         obj = next(expr_obj)
 
-        return obj._expression if hasattr(obj, '_expression') else self.__name__
+        return '|'.join(o._expression for o in obj) if type(obj) is list \
+        else obj._expression if hasattr(obj, '_expression') \
+        else self.__name__
 
     def __call__(self, *args):
         """Simulate a function call."""
