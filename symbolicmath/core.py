@@ -210,15 +210,15 @@ class ExpressionString:
     # --------------------------------
 
     @unary_operator('~(%s)')
-    def __invert__(self, other):
+    def __invert__(self):
         pass
 
     @unary_operator('-(%s)')
-    def __neg__(self, other):
+    def __neg__(self):
         pass
 
     @unary_operator('+(%s)')
-    def __pos__(self, other):
+    def __pos__(self):
         pass
 
 
