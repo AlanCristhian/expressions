@@ -73,79 +73,79 @@ class ExpressionString:
     def __add__(self, other):
         pass
 
-    @binary_left_operator('%s&(%s)')        
+    @binary_left_operator('%s&(%s)')
     def __and__(self, other):
         pass
 
-    @binary_left_operator('%s/(%s)')        
+    @binary_left_operator('%s/(%s)')
     def __div__(self, other):
         pass
 
-    @binary_left_operator('%s==(%s)')        
+    @binary_left_operator('%s==(%s)')
     def __eq__(self, other):
         pass
 
-    @binary_left_operator('%s//(%s)')        
+    @binary_left_operator('%s//(%s)')
     def __floordiv__(self, other):
         pass
 
-    @binary_left_operator('%s>=(%s)')        
+    @binary_left_operator('%s>=(%s)')
     def __ge__(self, other):
         pass
 
-    @binary_left_operator('%s>(%s)')        
+    @binary_left_operator('%s>(%s)')
     def __gt__(self, other):
         pass
 
-    @binary_left_operator('%s<=(%s)')        
+    @binary_left_operator('%s<=(%s)')
     def __le__(self, other):
         pass
 
-    @binary_left_operator('%s<<(%s)')        
+    @binary_left_operator('%s<<(%s)')
     def __lshift__(self, other):
         pass
 
-    @binary_left_operator('%s<(%s)')        
+    @binary_left_operator('%s<(%s)')
     def __lt__(self, other):
         pass
 
-    @binary_left_operator('%s@(%s)')        
+    @binary_left_operator('%s@(%s)')
     def __matmul__(self, other):
         pass
 
-    @binary_left_operator('%s%%(%s)')        
+    @binary_left_operator('%s%%(%s)')
     def __mod__(self, other):
         pass
 
-    @binary_left_operator('%s*(%s)')        
+    @binary_left_operator('%s*(%s)')
     def __mul__(self, other):
         pass
 
-    @binary_left_operator('%s!=(%s)')        
+    @binary_left_operator('%s!=(%s)')
     def __ne__(self, other):
         pass
 
-    @binary_left_operator('%s|(%s)')        
+    @binary_left_operator('%s|(%s)')
     def __or__(self, other):
         pass
 
-    @binary_left_operator('%s**(%s)')        
+    @binary_left_operator('%s**(%s)')
     def __pow__(self, other):
         pass
 
-    @binary_left_operator('%s>>(%s)')        
+    @binary_left_operator('%s>>(%s)')
     def __rshift__(self, other):
         pass
 
-    @binary_left_operator('%s-(%s)')        
+    @binary_left_operator('%s-(%s)')
     def __sub__(self, other):
         pass
 
-    @binary_left_operator('%s/(%s)')        
+    @binary_left_operator('%s/(%s)')
     def __truediv__(self, other):
         pass
 
-    @binary_left_operator('%s^(%s)')        
+    @binary_left_operator('%s^(%s)')
     def __xor__(self, other):
         pass
 
