@@ -1,6 +1,6 @@
-# expressions
+# symbolic
 
-An experimental library that allow your define sympy expressions with
+An experimental library that allow your define sympy symbolic with
  **declarative syntax**.
 
 ## Matrix definition
@@ -8,7 +8,7 @@ An experimental library that allow your define sympy expressions with
 You can define vectors and matrix whit an natural sintax:
 
 ```python
->>> from expressions.types import Real
+>>> from symbolic import Real
 >>> v = Real**3
 >>> v
 Real([0, 0, 0])
@@ -25,7 +25,7 @@ Real([1, 555, 3])
 Below is the sintax to define a matrix:
 
 ```python
->>> from expressions.types import Real
+>>> from symbolic.types import Real
 >>> A = Real**3*3
 >>> A
 Real([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
@@ -39,16 +39,16 @@ Real([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 For example, in the quadratic formula, the expression underneath the square
 root sign is the discriminant of the quadratic equation, and is defined as:
 
-`Δ = {b² - 4ac | (a, b, c) ∊ ℝ³}`
+`Δ: D ⊂ ℝ³ → ℝ = {b² - 4ac | (a, b, c) ∊ ℝ³}`
 
 The above mathematical expression can be writed with the following notation in
 Python:
 
 ```python
-discriminant = Real(b**2 - 4*a*c Real for (a, b, c) in Real**3)
+discriminant = Real(b**2 - 4*a*c for (a, b, c) in Real**3)
 ```
 
-The `Real` class in `expressions` module translate the *generator expression*
+The `Real` class in `symbolic` module translate the *generator expression*
 to the function:
 
 ```python
@@ -61,13 +61,17 @@ delta = function_expression()
 Below is the complete example written in Python:
 
 ```python
->>> from expressions import Real
->>> delta = Real((b**2 - 4*a*c) for (a, b, c) in Real**3)
+>>> from symbolic import Real
+>>> delta = Real(b**2 - 4*a*c for (a, b, c) in Real**3)
+>>> delta(1, 2, 3)
+delta(1, 2, 3)
+>>> next(delta(1, 2, 3))
+-8
 >>> delta.subs([(a, 1), (b, 2), (c, 3)])
 -8
 ```
 
-#### Domain of a function
+#### Domain of a function (not yet implemented)
 
 The you can define the domain of a function. E.g: `D` is cilinder with
 `height = 2` and `radius = 1` and is paralell to `z` axis:
