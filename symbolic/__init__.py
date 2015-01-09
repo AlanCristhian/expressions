@@ -1,5 +1,5 @@
 """A module that let you define functions with generator expressions."""
-from symbolicmath import core
+from symbolic import core
 
 
 class Object(core.BaseType):
