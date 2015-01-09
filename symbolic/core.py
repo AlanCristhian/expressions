@@ -227,9 +227,9 @@ class ExpressionString:
 # =============
 
 # Supose that I wish to define a vector with the below sintax:
-# >>> v = Object**3
-# The upper expression mean that `v` is a 3-vector with Object numbers. The 
-# VectorMeta metaclass add this feature to the `Object` class through
+# >>> v = Any**3
+# The upper expression mean that `v` is a 3-vector with Any numbers. The 
+# VectorMeta metaclass add this feature to the `Any` class through
 # the `VectorMeta.__pow__()` method.
 
 class VectorMeta(type):
@@ -253,7 +253,7 @@ class VectorMeta(type):
 # I want to define a function that do type checking of arguments and values
 # returned. All those with generator-expressions. E.g:
 
-# >>> double = Object(2*x for x in Object)
+# >>> double = Any(2*x for x in Any)
 # >>> double(4)
 # 8
 
@@ -331,10 +331,10 @@ class CallableObject(metaclass=IterableAndVectorMeta):
 # =============
 
 # Now supose that I wish to define a matrix with the sintax:
-# >> A = Object**3*4
+# >> A = Any**3*4
 # The `A` object is a matrix with 3 rows and 4 columns. The
 # `MatrixType.__mul__()` method set such feature to the object created
-# with the `Object**3` expression. In te example `Object` is an subclass of
+# with the `Any**3` expression. In te example `Any` is an subclass of
 # `MatrixType`.
 
 class MatrixType(CallableObject):

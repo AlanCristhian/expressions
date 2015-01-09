@@ -2,13 +2,13 @@
 from symbolic import core
 
 
-class Object(core.BaseType):
+class Any(core.BaseType):
     """The most generic type."""
     def __setitem__(self, key, value):
         return self._array.__setitem__(key, value)
 
     def __repr__(self):
-        return 'Object(%s)' % repr(self._array)
+        return 'Any(%s)' % repr(self._array)
 
 
 class System(core.BaseType):
