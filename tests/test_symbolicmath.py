@@ -1,6 +1,6 @@
 import unittest
 
-import symbolicmath as sm
+import symbolic as sm
 
 
 class TestNatural(unittest.TestCase):

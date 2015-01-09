@@ -1,7 +1,7 @@
 import unittest
 
-from symbolicmath import solvers
-import symbolicmath as sm
+from symbolic import solvers
+import symbolic as sm
 
 
 class TestCoefficientMatrix(unittest.TestCase):
@@ -18,13 +18,13 @@ class TestCoefficientMatrix(unittest.TestCase):
             9*x1 + 10*x2 - 11*x3 == 12]
                 for x1, x2, x3 in sm.Object)
 
-        expected = sm.Object([
+        expected = [
             [-1, 2, -3, 4],
             [5, -6, 7, -8],
-            [9, 10, -11, 12]])
+            [9, 10, -11, 12]]
 
         obtained = solvers.extract_coefficients(system)
-        self.assertEqual(obtained._array, expected._array)
+        self.assertEqual(obtained, expected)
 
 
 class TestSolver(unittest.TestCase):
@@ -39,6 +39,17 @@ class TestSolver(unittest.TestCase):
             0 == x + 4 for x in sm.Object)
         result = solvers.solve(expr)
         self.assertEqual(result, {'x': -4.0})
+
+    def test_solve_system_of_3x3(self):
+        system = sm.System([
+            -x1  + 2*x2  - 3*x3 == 4,
+            5*x1 - 6*x2  + 7*x3  == -8,
+            9*x1 + 10*x2 - 11*x3 == 12]
+                for x1, x2, x3 in sm.Object)
+        r = solvers.solve(system)
+        self.assertAlmostEqual(r['x1'], 0)
+        self.assertAlmostEqual(r['x2'], -1)
+        self.assertAlmostEqual(r['x3'], -2)
 
 if __name__ == '__main__':
     unittest.main()
