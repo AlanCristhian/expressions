@@ -76,7 +76,7 @@ delta(1, 2, 3)
 The you can define the domain of a function. E.g: `D` is cilinder with
 `height = 2` and `radius = 1` and is paralell to `z` axis:
 
-`D = {(x, y, z) | (x, y, z) ∊ ℝ³, 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
+`D = {(x, y, z) ∊ ℝ³, 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
 
 Is translated to Python3 as:
 
