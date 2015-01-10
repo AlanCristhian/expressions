@@ -11,11 +11,27 @@ class TestCoefficientMatrix(unittest.TestCase):
         expected = 12
         self.assertEqual(obtained, expected)
 
-    def test_coefficients_matrix(self):
+    def test_expanded_coefficients_matrix(self):
         system = sm.System([
-             -x1  + 2*x2  - 3*x3 ==  4,
-            5*x1 -  6*x2  + 7*x3 == -8,
+             -x1 +  2*x2 -  3*x3 ==  4,
+            5*x1 -  6*x2 +  7*x3 == -8,
             9*x1 + 10*x2 - 11*x3 == 12]
+                for x1, x2, x3 in sm.Any)
+
+        expected = [[-1,  2,  -3,  4],
+                    [ 5, -6,   7, -8],
+                    [ 9, 10, -11, 12]]
+
+        obtained = solvers.expanded_coefficients_matrix(system)
+        self.assertEqual(obtained, expected)
+
+    def test_unsorted_expanded_coefficients_matrix(self):
+        """Should extract all coefficients of an unsorted system of linear
+        equalities."""
+        system = sm.System([
+                      -x1 +  2*x2 ==  4 + 3*x3,
+              7*x3 +  5*x1 - 6*x2 == -8,
+            -11*x3 + 10*x2 + 9*x1 == 12]
                 for x1, x2, x3 in sm.Any)
 
         expected = [[-1,  2,  -3,  4],
