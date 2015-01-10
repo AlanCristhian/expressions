@@ -18,7 +18,7 @@ def extract_independent_term(expression, varnames):
     return eval(expression)
 
 
-def coefficients_matrix(system):
+def expanded_coefficients_matrix(system):
     equalities = system._expression.split('|')
     expression_list = [to_expression(equality) for equality in equalities]
     varnames = system._generator.gi_code.co_varnames[1:] # variabe name list
@@ -50,51 +50,43 @@ def coefficients_matrix(system):
     return coefficient_matrix
 
 
-def gauss(A):
-    n = len(A)
+# Gaussian elimination algorithm by Isaac Evans.
+# github.com/ievans/GaussianElimination/blob/master/gaussianelimination.py
 
-    for i in range(0, n):
-        # Search for maximum in this column
-        maxEl = abs(A[i][i])
-        maxRow = i
-        for k in range(i+1, n):
-            if abs(A[k][i]) > maxEl:
-                maxEl = abs(A[k][i])
-                maxRow = k
+def myGauss(m):
+    # eliminate columns
+    for col in range(len(m[0])):
+        for row in range(col+1, len(m)):
+            r = [(rowValue * (-(m[row][col] / m[col][col])))
+                for rowValue in m[col]]
+            m[row] = [sum(pair) for pair in zip(m[row], r)]
+    # now backsolve by substitution
+    ans = []
+    m.reverse() # makes it easier to backsolve
+    for sol in range(len(m)):
+        if sol == 0:
+            ans.append(m[sol][-1] / m[sol][-2])
+        else:
+            inner = 0
+            # substitute in all known coefficients
+            for x in range(sol):
+                inner += (ans[x]*m[sol][-2-x])
+            # the equation is now reduced to ax + b = c form
+            # solve with (c - b) / a
+            ans.append((m[sol][-1]-inner)/m[sol][-sol-2])
+    ans.reverse()
+    return ans
 
-        # Swap maximum row with current row (column by column)
-        for k in range(i, n+1):
-            tmp = A[maxRow][k]
-            A[maxRow][k] = A[i][k]
-            A[i][k] = tmp
-
-        # Make all rows below this one 0 in current column
-        for k in range(i+1, n):
-            c = -A[k][i]/A[i][i]
-            for j in range(i, n+1):
-                if i == j:
-                    A[k][j] = 0
-                else:
-                    A[k][j] += c * A[i][j]
-
-    # Solve equation Ax=b for an upper triangular matrix A
-    x = [0 for i in range(n)]
-    for i in range(n-1, -1, -1):
-        x[i] = A[i][n]/A[i][i]
-        for k in range(i-1, -1, -1):
-            A[k][n] -= A[k][i] * x[i]
-    return x
 
 
 def solve(system):
     # get name of each variables
     var_name = system._generator.gi_code.co_varnames[1:]
 
-    # A is the coeficcient matrix and b is the vector of independent terms
-    # Ax = b
-    M = coefficients_matrix(system)
+    # M is the expanded coefficient matrix: M = A|b
+    M = expanded_coefficients_matrix(system)
 
-    x = gauss(M)
+    x = myGauss(M)
 
     result = {name: value for name, value in zip(var_name, x)}
 
