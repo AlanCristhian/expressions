@@ -5,10 +5,14 @@ import symbolic as sm
 
 
 class TestCoefficientMatrix(unittest.TestCase):
-    def test_extract_independent_term(self):
-        expr = '9*x1 + 10*x2 - 11*x3 + 12'
-        obtained = solvers.extract_independent_term(expr, ['x1', 'x2', 'x3'])
-        expected = 12
+    def test_get_independent_term_vector(self):
+        expr_list = [
+            " -x1 +  2*x2 -  3*x3 -  4",
+            "5*x1 -  6*x2 +  7*x3 +  8",
+            "9*x1 + 10*x2 - 11*x3 - 12"]
+        obtained = solvers.get_independent_term_vector(
+            expr_list, ['x1', 'x2', 'x3'])
+        expected = [-4, 8, -12]
         self.assertEqual(obtained, expected)
 
     def test_expanded_coefficients_matrix(self):
@@ -16,7 +20,7 @@ class TestCoefficientMatrix(unittest.TestCase):
              -x1 +  2*x2 -  3*x3 ==  4,
             5*x1 -  6*x2 +  7*x3 == -8,
             9*x1 + 10*x2 - 11*x3 == 12]
-                for x1, x2, x3 in sm.Any)
+                for (x1, x2, x3) in sm.Any)
 
         expected = [[-1,  2,  -3,  4],
                     [ 5, -6,   7, -8],
@@ -32,7 +36,7 @@ class TestCoefficientMatrix(unittest.TestCase):
                       -x1 +  2*x2 ==  4 + 3*x3,
               7*x3 +  5*x1 - 6*x2 == -8,
             -11*x3 + 10*x2 + 9*x1 == 12]
-                for x1, x2, x3 in sm.Any)
+                for (x1, x2, x3) in sm.Any)
 
         expected = [[-1,  2,  -3,  4],
                     [ 5, -6,   7, -8],
@@ -59,7 +63,7 @@ class TestSolver(unittest.TestCase):
             -x1  + 2*x2  - 3*x3 == 4,
             5*x1 - 6*x2  + 7*x3  == -8,
             9*x1 + 10*x2 - 11*x3 == 12]
-                for x1, x2, x3 in sm.Any)
+                for (x1, x2, x3) in sm.Any)
         r = solvers.solve(system)
         self.assertAlmostEqual(r['x1'], 0.0)
         self.assertAlmostEqual(r['x2'], -1.0)

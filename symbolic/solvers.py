@@ -3,62 +3,52 @@ import symbolic as sm
 import functools as ft
 
 
-def to_expression(equality):
-    return equality.replace("==","-(") + ")"
-
-
-def solve_single_equality(expression, variable):
-    c = eval(expression, {variable: 1j})
-    return {variable: -c.real/c.imag}
-
-
-def extract_independent_term(expression, varnames):
-    for var in varnames:
-        expression = expression.replace(var, '0')
-    return eval(expression)
+def get_independent_term_vector(expression_list, var_names):
+    vector = []
+    for expression in expression_list:
+        for var in var_names:
+            expression = expression.replace(var, '0')
+        vector.append(eval(expression))
+    return vector
 
 
 def expanded_coefficients_matrix(system):
+    # make a list of equalities
     equalities = system._expression.split('|')
-    expression_list = [to_expression(equality) for equality in equalities]
-    varnames = system._generator.gi_code.co_varnames[1:] # variabe name list
+    # transform each equality in an expression
+    expression_list = [item.replace("==","-(") + ")" for item in equalities]
+    # the list of names of each variable
+    var_names = system._generator.gi_code.co_varnames[1:]
 
-    # The below code make a identity matrix
-    N = len(varnames)
+    N = len(var_names)
     identity_matrix = \
         [['1' if i == j else '0' for i in range(N)] for j in range(N)]
 
-    indepentent_terms = [
-        extract_independent_term(e, varnames) for e in expression_list]
+    indepentent_terms = get_independent_term_vector(expression_list, var_names)
 
     coeff_column_expr = []
-    b = []
     for expression,independent_term in zip(expression_list, indepentent_terms):
         coeff_row_expr = []
         for row in identity_matrix:
             coeff_expr = expression
-            for value, name in zip(row, varnames):
+            for value, name in zip(row, var_names):
                 coeff_expr = coeff_expr.replace(name, value)
             coeff_row_expr.append(coeff_expr + '-%s' % independent_term)
         coeff_row_expr.append('-%s' % independent_term)
         coeff_column_expr.append(coeff_row_expr)
 
-    coefficient_matrix = [
-        [eval(item) for item in row]
-        for row in coeff_column_expr]
-
-    return coefficient_matrix
+    # Make and return the expanded coefficients matrix
+    return [[eval(item) for item in row] for row in coeff_column_expr]
 
 
 # Gaussian elimination algorithm by Isaac Evans.
 # github.com/ievans/GaussianElimination/blob/master/gaussianelimination.py
 
-def myGauss(m):
+def gaussian_elimination(m):
     # eliminate columns
     for col in range(len(m[0])):
         for row in range(col+1, len(m)):
-            r = [(rowValue * (-(m[row][col] / m[col][col])))
-                for rowValue in m[col]]
+            r = (-m[row][col] / m[col][col] * rowValue for rowValue in m[col])
             m[row] = [sum(pair) for pair in zip(m[row], r)]
     # now backsolve by substitution
     ans = []
@@ -67,10 +57,8 @@ def myGauss(m):
         if sol == 0:
             ans.append(m[sol][-1] / m[sol][-2])
         else:
-            inner = 0
             # substitute in all known coefficients
-            for x in range(sol):
-                inner += (ans[x]*m[sol][-2-x])
+            inner = sum(ans[x]*m[sol][-2-x] for x in range(sol))
             # the equation is now reduced to ax + b = c form
             # solve with (c - b) / a
             ans.append((m[sol][-1]-inner)/m[sol][-sol-2])
@@ -78,16 +66,12 @@ def myGauss(m):
     return ans
 
 
-
 def solve(system):
     # get name of each variables
     var_name = system._generator.gi_code.co_varnames[1:]
-
-    # M is the expanded coefficient matrix: M = A|b
     M = expanded_coefficients_matrix(system)
-
-    x = myGauss(M)
-
-    result = {name: value for name, value in zip(var_name, x)}
-
-    return result
+    # solve the system
+    x = gaussian_elimination(M)
+    # Make and return a dict with that contains the name of each solution
+    # with their respective value
+    return {name: value for name, value in zip(var_name, x)}
