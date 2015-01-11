@@ -304,18 +304,20 @@ class CallableObject(metaclass=IterableAndVectorMeta):
         self._generator = generator
         self._send = self._generator.gi_frame.f_locals['.0'].send
 
-    @helpers.cached_property
-    def _expression(self):
-        # Cache the send method of the internal coroutine. Before an
-        # investigation I found that the first expression_list in the for
-        # statement everything is stored in the same place:
+    def _make_expression(self):
+        """Send an ExpressionString() object to the generator. Then
+        return the object with the "_expression" property."""
+        # CAVEAT: everything the first var name in gi_code.co_varnames is "0.0"
+        # This is the name of the iterator used in the first *for* statement
+        # in the generator.
         expr_obj = self(*(ExpressionString(name)
             for name in self._generator.gi_code.co_varnames[1:]))
+        return next(expr_obj)
 
-        obj = next(expr_obj)
-
-        return '|'.join(o._expression for o in obj) if type(obj) is list \
-        else obj._expression if hasattr(obj, '_expression') \
+    @helpers.cached_property
+    def _expression(self):
+        obj = self._make_expression()
+        return obj._expression if hasattr(obj, '_expression') \
         else self.__name__
 
     def __call__(self, *args):
