@@ -18,7 +18,7 @@ from . import helpers
 # generator object.
 
 
-def binary_left_operator(template):
+def _binary_left_operator(template):
     def decorator(function):
         def operator(self, other):
             result = ExpressionString()
@@ -33,7 +33,7 @@ def binary_left_operator(template):
     return decorator
 
 
-def binary_right_operator(template):
+def _binary_right_operator(template):
     def decorator(function):
         def operator(self, other):
             result = ExpressionString()
@@ -48,7 +48,7 @@ def binary_right_operator(template):
     return decorator
 
 
-def unary_operator(template):
+def _unary_operator(template):
     def decorator(function):
         def operator(self):
             result = ExpressionString()
@@ -68,155 +68,155 @@ class ExpressionString:
     def __repr__(self):
         return self._expression
 
-    @binary_left_operator('%s+(%s)')
+    @_binary_left_operator('%s+(%s)')
     def __add__(self, other):
         pass
 
-    @binary_left_operator('%s&(%s)')
+    @_binary_left_operator('%s&(%s)')
     def __and__(self, other):
         pass
 
-    @binary_left_operator('%s/(%s)')
+    @_binary_left_operator('%s/(%s)')
     def __div__(self, other):
         pass
 
-    @binary_left_operator('%s==(%s)')
+    @_binary_left_operator('%s==(%s)')
     def __eq__(self, other):
         pass
 
-    @binary_left_operator('%s//(%s)')
+    @_binary_left_operator('%s//(%s)')
     def __floordiv__(self, other):
         pass
 
-    @binary_left_operator('%s>=(%s)')
+    @_binary_left_operator('%s>=(%s)')
     def __ge__(self, other):
         pass
 
-    @binary_left_operator('%s>(%s)')
+    @_binary_left_operator('%s>(%s)')
     def __gt__(self, other):
         pass
 
-    @binary_left_operator('%s<=(%s)')
+    @_binary_left_operator('%s<=(%s)')
     def __le__(self, other):
         pass
 
-    @binary_left_operator('%s<<(%s)')
+    @_binary_left_operator('%s<<(%s)')
     def __lshift__(self, other):
         pass
 
-    @binary_left_operator('%s<(%s)')
+    @_binary_left_operator('%s<(%s)')
     def __lt__(self, other):
         pass
 
-    @binary_left_operator('%s@(%s)')
+    @_binary_left_operator('%s@(%s)')
     def __matmul__(self, other):
         pass
 
-    @binary_left_operator('%s%%(%s)')
+    @_binary_left_operator('%s%%(%s)')
     def __mod__(self, other):
         pass
 
-    @binary_left_operator('%s*(%s)')
+    @_binary_left_operator('%s*(%s)')
     def __mul__(self, other):
         pass
 
-    @binary_left_operator('%s!=(%s)')
+    @_binary_left_operator('%s!=(%s)')
     def __ne__(self, other):
         pass
 
-    @binary_left_operator('%s|(%s)')
+    @_binary_left_operator('%s|(%s)')
     def __or__(self, other):
         pass
 
-    @binary_left_operator('%s**(%s)')
+    @_binary_left_operator('%s**(%s)')
     def __pow__(self, other):
         pass
 
-    @binary_left_operator('%s>>(%s)')
+    @_binary_left_operator('%s>>(%s)')
     def __rshift__(self, other):
         pass
 
-    @binary_left_operator('%s-(%s)')
+    @_binary_left_operator('%s-(%s)')
     def __sub__(self, other):
         pass
 
-    @binary_left_operator('%s/(%s)')
+    @_binary_left_operator('%s/(%s)')
     def __truediv__(self, other):
         pass
 
-    @binary_left_operator('%s^(%s)')
+    @_binary_left_operator('%s^(%s)')
     def __xor__(self, other):
         pass
 
     # --------------------------------
 
-    @binary_right_operator('(%s)+%s')
+    @_binary_right_operator('(%s)+%s')
     def __radd__(self, other):
         pass
 
-    @binary_right_operator('(%s)&%s')
+    @_binary_right_operator('(%s)&%s')
     def __rand__(self, other):
         pass
 
-    @binary_right_operator('(%s)/%s')
+    @_binary_right_operator('(%s)/%s')
     def __rdiv__(self, other):
         pass
 
-    @binary_right_operator('(%s)//%s')
+    @_binary_right_operator('(%s)//%s')
     def __rfloordiv__(self, other):
         pass
 
-    @binary_right_operator('(%s)<<%s')
+    @_binary_right_operator('(%s)<<%s')
     def __rlshift__(self, other):
         pass
 
-    @binary_right_operator('(%s)@%s')
+    @_binary_right_operator('(%s)@%s')
     def __rmatmul__(self, other):
         pass
 
-    @binary_right_operator('(%s)%%%s')
+    @_binary_right_operator('(%s)%%%s')
     def __rmod__(self, other):
         pass
 
-    @binary_right_operator('(%s)*%s')
+    @_binary_right_operator('(%s)*%s')
     def __rmul__(self, other):
         pass
 
-    @binary_right_operator('(%s)|%s')
+    @_binary_right_operator('(%s)|%s')
     def __ror__(self, other):
         pass
 
-    @binary_right_operator('(%s)**%s')
+    @_binary_right_operator('(%s)**%s')
     def __rpow__(self, other):
         pass
 
-    @binary_right_operator('(%s)>>%s')
+    @_binary_right_operator('(%s)>>%s')
     def __rrshift__(self, other):
         pass
 
-    @binary_right_operator('(%s)-%s')
+    @_binary_right_operator('(%s)-%s')
     def __rsub__(self, other):
         pass
 
-    @binary_right_operator('(%s)/%s')
+    @_binary_right_operator('(%s)/%s')
     def __rtruediv__(self, other):
         pass
 
-    @binary_right_operator('(%s)^%s')
+    @_binary_right_operator('(%s)^%s')
     def __rxor__(self, other):
         pass
 
     # --------------------------------
 
-    @unary_operator('~(%s)')
+    @_unary_operator('~(%s)')
     def __invert__(self):
         pass
 
-    @unary_operator('-(%s)')
+    @_unary_operator('-(%s)')
     def __neg__(self):
         pass
 
-    @unary_operator('+(%s)')
+    @_unary_operator('+(%s)')
     def __pos__(self):
         pass
 
@@ -430,7 +430,3 @@ class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
         assert multiplicant > 0
 
         return MatrixType([self._array for j in range(0, multiplicant)])
-
-
-class BaseType(MatrixType):
-    """A class that have all shared behaviours of all numeric types."""
