@@ -404,7 +404,6 @@ class CallableObject(NamedObject):
 # with the `Any**3` expression. In te example `Any` is an subclass of
 # `MatrixType`.
 
-# class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
 class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
     """Add `NumericType**M*N` API interface to make an MxN matrix with
     components of `NumericType`type.
