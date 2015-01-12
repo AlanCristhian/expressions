@@ -2,7 +2,7 @@
 from symbolic import core
 
 
-class Any(core.BaseType):
+class Any(core.MatrixType):
     """The most generic type."""
     def __setitem__(self, key, value):
         return self._array.__setitem__(key, value)
@@ -11,7 +11,7 @@ class Any(core.BaseType):
         return 'Any(%s)' % repr(self._array)
 
 
-class System(core.BaseType):
+class System(core.CallableObject):
     """A class that wrap a generator that have an system of
     equalities."""
     def __init__(self, system, *args, **kwds):
