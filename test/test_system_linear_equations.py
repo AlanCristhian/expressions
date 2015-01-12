@@ -1,6 +1,6 @@
 import unittest
 
-from symbolic import solvers
+from symbolic.solvers import system_linear_equations as solvers
 import symbolic as sm
 
 
