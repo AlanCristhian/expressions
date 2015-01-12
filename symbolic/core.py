@@ -2,6 +2,7 @@
 numeric sets."""
 
 import inspect
+import traceback
 
 from . import helpers
 
@@ -296,10 +297,19 @@ class IterableAndVectorMeta(IterableMeta, VectorMeta):
 # Variables with the .__name__ property
 # =====================================
 
+
 class NamedObject:
     """Make an object with the __name__ property."""
     def __init__(self):
-        self._name = helpers.get_name()
+        self._name = self._get_name()
+
+    def _get_name(self):
+        """Find the name of the instance of the current class.
+        Then store it in the .__name__ attribute."""
+        *_, text = traceback.extract_stack()[-5]
+        if text:
+            name, *_ = text.split('=')
+            return name.strip()
 
     def _get_outer_globals(self, frame):
         """Yield all global variables in the higher (calling) frames.

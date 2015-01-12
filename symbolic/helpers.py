@@ -1,7 +1,5 @@
 """A set of utility functions."""
 
-import traceback
-
 
 class cached_property:
     """ A property that is only computed once per instance and then replaces
@@ -16,12 +14,3 @@ class cached_property:
         if obj is None: return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value
-
-
-def get_name():
-    """Find the name of the instance of the current class.
-    Then store it in the .__name__ attribute."""
-    *_, text = traceback.extract_stack()[-5]
-    if text:
-        name, *_ = text.split('=')
-        return name.strip()
