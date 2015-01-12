@@ -1,35 +1,35 @@
 import unittest
-from symbolic.core import (BaseType, argument_sender, CallableObject,
+from symbolic.core import (MatrixType, argument_sender, CallableObject,
     ExpressionString)
 
 
-class TestBaseTypeType(unittest.TestCase):
-    def test_BaseType_vector(self):
-        v = BaseType([0, 0, 0])
+class TestMatrixType(unittest.TestCase):
+    def test_MatrixType_vector(self):
+        v = MatrixType([0, 0, 0])
         self.assertEqual(v._array, [0, 0, 0])
 
-    def test_BaseType_vector_interface(self):
+    def test_MatrixType_vector_interface(self):
         """Should define a 3-vector of numbers"""
-        u = BaseType**3;
-        self.assertEqual(u._array, BaseType([0, 0, 0])._array)
+        u = MatrixType**3;
+        self.assertEqual(u._array, MatrixType([0, 0, 0])._array)
 
-    def test_BaseType_matrix(self):
-        A = BaseType([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    def test_MatrixType_matrix(self):
+        A = MatrixType([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         array = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertEqual(A._array, array)
 
-    def test_BaseType_matrix_interface(self):
-        A = BaseType**3*3
+    def test_MatrixType_matrix_interface(self):
+        A = MatrixType**3*3
         array = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertEqual(A._array, array)
 
-    def test_BaseType_matrix_getitem(self):
-        A = BaseType([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    def test_MatrixType_matrix_getitem(self):
+        A = MatrixType([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         item = A[1][2]
         self.assertEqual(item, 6)
 
-    def test_three_dimensions_BaseType_matrix_interface(self):
-        A = BaseType**3*3*2
+    def test_three_dimensions_MatrixType_matrix_interface(self):
+        A = MatrixType**3*3*2
         array = [
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
             [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -50,37 +50,37 @@ class FunctionTest(unittest.TestCase):
         self.assertEqual(b, 2)
 
     def test_CallableObject(self):
-        double = CallableObject(x*2 for x in BaseType)
+        double = CallableObject(x*2 for x in MatrixType)
         self.assertEqual(8, next(double(4)))
 
     def test_many_variables(self):
-        add = BaseType(x + y for x, y in BaseType)
+        add = MatrixType(x + y for x, y in MatrixType)
         added = add(3, 4)
         self.assertEqual(7, next(added))
 
 
 class ExpressionTest(unittest.TestCase):
     def test_bynary_left_operators(self):
-        add = BaseType(x+2 for x in BaseType)
-        and_ = BaseType(x&2 for x in BaseType)
-        div = BaseType(x/2 for x in BaseType)
-        eq = BaseType(x==2 for x in BaseType)
-        floordiv = BaseType(x//2 for x in BaseType)
-        ge = BaseType(x>=2 for x in BaseType)
-        gt = BaseType(x>2 for x in BaseType)
-        le = BaseType(x<=2 for x in BaseType)
-        lshift = BaseType(x<<2 for x in BaseType)
-        lt = BaseType(x<2 for x in BaseType)
-        # matmul = BaseType(x@2 for x in BaseType)
-        mod = BaseType(x%2 for x in BaseType)
-        mul = BaseType(x*2 for x in BaseType)
-        ne = BaseType(x!=2 for x in BaseType)
-        or_ = BaseType(x|2 for x in BaseType)
-        pow = BaseType(x**2 for x in BaseType)
-        rshift = BaseType(x>>2 for x in BaseType)
-        sub = BaseType(x-2 for x in BaseType)
-        truediv = BaseType(x/2 for x in BaseType)
-        xor = BaseType(x^2 for x in BaseType)
+        add = MatrixType(x+2 for x in MatrixType)
+        and_ = MatrixType(x&2 for x in MatrixType)
+        div = MatrixType(x/2 for x in MatrixType)
+        eq = MatrixType(x==2 for x in MatrixType)
+        floordiv = MatrixType(x//2 for x in MatrixType)
+        ge = MatrixType(x>=2 for x in MatrixType)
+        gt = MatrixType(x>2 for x in MatrixType)
+        le = MatrixType(x<=2 for x in MatrixType)
+        lshift = MatrixType(x<<2 for x in MatrixType)
+        lt = MatrixType(x<2 for x in MatrixType)
+        # matmul = MatrixType(x@2 for x in MatrixType)
+        mod = MatrixType(x%2 for x in MatrixType)
+        mul = MatrixType(x*2 for x in MatrixType)
+        ne = MatrixType(x!=2 for x in MatrixType)
+        or_ = MatrixType(x|2 for x in MatrixType)
+        pow = MatrixType(x**2 for x in MatrixType)
+        rshift = MatrixType(x>>2 for x in MatrixType)
+        sub = MatrixType(x-2 for x in MatrixType)
+        truediv = MatrixType(x/2 for x in MatrixType)
+        xor = MatrixType(x^2 for x in MatrixType)
 
         self.assertEqual(add._expression, 'x+(2)')
         self.assertEqual(and_._expression, 'x&(2)')
@@ -104,20 +104,20 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(xor._expression, 'x^(2)')
 
     def test_bynary_right_operators(self):
-        radd = BaseType(2+x for x in BaseType)
-        rand = BaseType(2&x for x in BaseType)
-        rdiv = BaseType(2/x for x in BaseType)
-        rfloordiv = BaseType(2//x for x in BaseType)
-        rlshift = BaseType(2<<x for x in BaseType)
-        # rmatmul = BaseType(2@x for x in BaseType)
-        rmod = BaseType(2%x for x in BaseType)
-        rmul = BaseType(2*x for x in BaseType)
-        ror_ = BaseType(2|x for x in BaseType)
-        rpow = BaseType(2**x for x in BaseType)
-        rrshift = BaseType(2>>x for x in BaseType)
-        rsub = BaseType(2-x for x in BaseType)
-        rtruediv = BaseType(2/x for x in BaseType)
-        rxor = BaseType(2^x for x in BaseType)
+        radd = MatrixType(2+x for x in MatrixType)
+        rand = MatrixType(2&x for x in MatrixType)
+        rdiv = MatrixType(2/x for x in MatrixType)
+        rfloordiv = MatrixType(2//x for x in MatrixType)
+        rlshift = MatrixType(2<<x for x in MatrixType)
+        # rmatmul = MatrixType(2@x for x in MatrixType)
+        rmod = MatrixType(2%x for x in MatrixType)
+        rmul = MatrixType(2*x for x in MatrixType)
+        ror_ = MatrixType(2|x for x in MatrixType)
+        rpow = MatrixType(2**x for x in MatrixType)
+        rrshift = MatrixType(2>>x for x in MatrixType)
+        rsub = MatrixType(2-x for x in MatrixType)
+        rtruediv = MatrixType(2/x for x in MatrixType)
+        rxor = MatrixType(2^x for x in MatrixType)
 
         self.assertEqual(radd._expression, '(2)+x')
         self.assertEqual(rand._expression, '(2)&x')
@@ -135,23 +135,23 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(rxor._expression, '(2)^x')
 
     def test_unary_operators(self):
-        invert = BaseType(~x for x in BaseType)
-        neg = BaseType(-x for x in BaseType)
-        pos = BaseType(+x for x in BaseType)
+        invert = MatrixType(~x for x in MatrixType)
+        neg = MatrixType(-x for x in MatrixType)
+        pos = MatrixType(+x for x in MatrixType)
 
         self.assertEqual(invert._expression, '~(x)')
         self.assertEqual(neg._expression, '-(x)')
         self.assertEqual(pos._expression, '+(x)')
 
     def test___name__property(self):
-        """The BaseType() instance shoud have the __name__ property."""
-        named_lambda = BaseType(+x for x in BaseType)
+        """The MatrixType() instance shoud have the __name__ property."""
+        named_lambda = MatrixType(+x for x in MatrixType)
         self.assertEqual(named_lambda.__name__, 'named_lambda')
 
     def test_CallableObject_string(self):
         """Should make a correct code if use some CallableObject object."""
-        double = BaseType(x*2 for x in BaseType)
-        expr = BaseType(double(y) for y in BaseType)
+        double = MatrixType(x*2 for x in MatrixType)
+        expr = MatrixType(double(y) for y in MatrixType)
         self.assertEqual(expr._expression, 'double(y)')
 
 
