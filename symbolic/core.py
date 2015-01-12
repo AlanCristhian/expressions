@@ -296,18 +296,17 @@ class IterableAndVectorMeta(IterableMeta, VectorMeta):
 # Variables with the .__name__ property
 # =====================================
 
-def _get_outer_globals(frame, context=1):
-    """Yield all global variables in the higher (calling) frames.
-    """
-    while frame:
-        yield frame.f_globals
-        frame = frame.f_back
-
-
 class NamedObject:
     """Make an object with the __name__ property."""
     def __init__(self):
         self._name = helpers.get_name()
+
+    def _get_outer_globals(self, frame):
+        """Yield all global variables in the higher (calling) frames.
+        """
+        while frame:
+            yield frame.f_globals
+            frame = frame.f_back
 
     # NOTE: I define the __name__ property as a method because I need to store
     # the name after object creation. The @helpers.cached_property decorator
@@ -320,7 +319,7 @@ class NamedObject:
         # `helpers.get_name()` function return `None`. So, I find the name of
         # the var in the global namespace of each frame.
         if self._name is None:
-            global_variables = _get_outer_globals(inspect.currentframe())
+            global_variables = self._get_outer_globals(inspect.currentframe())
             for glob in global_variables:
                 for name, value in glob.items():
                     if value is self:
