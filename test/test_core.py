@@ -148,7 +148,7 @@ class ExpressionTest(unittest.TestCase):
         named_lambda = BaseType(+x for x in BaseType)
         self.assertEqual(named_lambda.__name__, 'named_lambda')
 
-    def testCallableObject_string(self):
+    def test_CallableObject_string(self):
         """Should make a correct code if use some CallableObject object."""
         double = BaseType(x*2 for x in BaseType)
         expr = BaseType(double(y) for y in BaseType)

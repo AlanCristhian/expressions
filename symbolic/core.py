@@ -1,8 +1,6 @@
 """A library with base classes and metaclasses that let define
 numeric sets."""
 
-import functools as ft
-import itertools as it
 import inspect
 
 from . import helpers
@@ -222,7 +220,6 @@ class ExpressionString:
         pass
 
 
-
 # Make a vector
 # =============
 
@@ -295,69 +292,6 @@ class IterableAndVectorMeta(IterableMeta, VectorMeta):
     pass
 
 
-# Third, I use the coroutine-object returned by the __iter__() method to pass
-# values in each iteration of the generator expression. Such values act like
-# funtions parameters. The generator-expression is an consumer.
-
-class CallableObject(metaclass=IterableAndVectorMeta):
-    def __init__(self, generator):
-        self._generator = generator
-        self._send = self._generator.gi_frame.f_locals['.0'].send
-
-    def _make_expression(self):
-        """Send an ExpressionString() object to the generator. Then
-        return the object with the "_expression" property."""
-        # CAVEAT: everything the first var name in gi_code.co_varnames is "0.0"
-        # This is the name of the iterator used in the first *for* statement
-        # in the generator.
-        expr_obj = self(*(ExpressionString(name)
-            for name in self._generator.gi_code.co_varnames[1:]))
-        return next(expr_obj)
-
-    @helpers.cached_property
-    def _expression(self):
-        obj = self._make_expression()
-        return obj._expression if hasattr(obj, '_expression') \
-        else self.__name__
-
-    def __call__(self, *args):
-        """Simulate a function call."""
-        # send arguments to the internal coroutine
-        self._send(args[0]) if len(args) is 1 else self._send(args)
-
-        # avance the generator and return their value
-        return self._generator
-
-
-# Make a matrix
-# =============
-
-# Now supose that I wish to define a matrix with the sintax:
-# >> A = Any**3*4
-# The `A` object is a matrix with 3 rows and 4 columns. The
-# `MatrixType.__mul__()` method set such feature to the object created
-# with the `Any**3` expression. In te example `Any` is an subclass of
-# `MatrixType`.
-
-class MatrixType(CallableObject):
-    """Add `NumericType**M*N` API interface to make an MxN matrix with
-    components of `NumericType`type.
-    """
-    def __init__(self, argument):
-        if type(argument) is not list:
-            super().__init__(argument)
-        self._array = argument
-
-    def __getitem__(self, arg):
-        return self._array.__getitem__(arg)
-
-    def __mul__(self, multiplicant):
-        assert type(multiplicant) is int
-        assert multiplicant > 0
-
-        return MatrixType([self._array for j in range(0, multiplicant)])
-
-
 
 # Variables with the .__name__ property
 # =====================================
@@ -370,10 +304,9 @@ def _get_outer_globals(frame, context=1):
         frame = frame.f_back
 
 
-class NamedObject(MatrixType):
+class NamedObject:
     """Make an object with the __name__ property."""
-    def __init__(self, argument):
-        super().__init__(argument)
+    def __init__(self):
         self._name = helpers.get_name()
 
     # NOTE: I define the __name__ property as a method because I need to store
@@ -396,10 +329,6 @@ class NamedObject(MatrixType):
             name = self._name
             del self._name
             return name
-
-    def __call__(self, *args):
-        result = super().__call__(*args)
-        return CalledObject(result, self.__name__, args)
 
 
 class CalledObject:
@@ -430,5 +359,70 @@ class CalledObject:
         return self._expression
 
 
-class BaseType(NamedObject):
+# Third, I use the coroutine-object returned by the __iter__() method to pass
+# values in each iteration of the generator expression. Such values act like
+# funtions parameters. The generator-expression is an consumer.
+
+class CallableObject(NamedObject):
+    def __init__(self, generator):
+        super().__init__()
+        self._generator = generator
+        self._send = self._generator.gi_frame.f_locals['.0'].send
+
+    def _make_expression(self):
+        """Send an ExpressionString() object to the generator. Then
+        return the object with the "_expression" property."""
+        # CAVEAT: everything the first var name in gi_code.co_varnames is "0.0"
+        # This is the name of the iterator used in the first *for* statement
+        # in the generator.
+        expr_obj = self(*(ExpressionString(name)
+            for name in self._generator.gi_code.co_varnames[1:]))
+        return next(expr_obj)
+
+    @helpers.cached_property
+    def _expression(self):
+        obj = self._make_expression()
+        return obj._expression if hasattr(obj, '_expression') \
+        else self.__name__
+
+    def __call__(self, *args):
+        """Simulate a function call."""
+        # send arguments to the internal coroutine
+        self._send(args[0]) if len(args) is 1 else self._send(args)
+
+        # avance the generator and return their value
+        return CalledObject(self._generator, self.__name__, args)
+
+
+# Make a matrix
+# =============
+
+# Now supose that I wish to define a matrix with the sintax:
+# >> A = Any**3*4
+# The `A` object is a matrix with 3 rows and 4 columns. The
+# `MatrixType.__mul__()` method set such feature to the object created
+# with the `Any**3` expression. In te example `Any` is an subclass of
+# `MatrixType`.
+
+# class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
+class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
+    """Add `NumericType**M*N` API interface to make an MxN matrix with
+    components of `NumericType`type.
+    """
+    def __init__(self, argument):
+        if type(argument) is not list:
+            super().__init__(argument)
+        self._array = argument
+
+    def __getitem__(self, arg):
+        return self._array.__getitem__(arg)
+
+    def __mul__(self, multiplicant):
+        assert type(multiplicant) is int
+        assert multiplicant > 0
+
+        return MatrixType([self._array for j in range(0, multiplicant)])
+
+
+class BaseType(MatrixType):
     """A class that have all shared behaviours of all numeric types."""
