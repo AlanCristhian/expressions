@@ -1,6 +1,7 @@
 import unittest
 
 from symbolic.solvers import system_linear_equations as solvers
+from symbolic import core
 import symbolic as sm
 
 
@@ -45,18 +46,19 @@ class TestCoefficientMatrix(unittest.TestCase):
         obtained = solvers.expanded_coefficients_matrix(system)
         self.assertEqual(obtained, expected)
 
+
 class TestSolver(unittest.TestCase):
     def test_solve_single_variable_linear_equation(self):
         expr = sm.System(
             x - 2*x + 5*x - 46*(235-24) == x + 2 for x in sm.Any)
         result = solvers.solve(expr)
-        self.assertEqual(result, {'x': 3236.0})
+        self.assertEqual(result, core.BinaryRelation('x', '==', 3236.0))
 
     def test_zero_equation(self):
         expr = sm.System(
             0 == x + 4 for x in sm.Any)
         result = solvers.solve(expr)
-        self.assertEqual(result, {'x': -4.0})
+        self.assertEqual(result, core.BinaryRelation('x', '==', -4.0))
 
     def test_solve_system_of_3x3(self):
         system = sm.System([
@@ -65,9 +67,9 @@ class TestSolver(unittest.TestCase):
             9*x1 + 10*x2 - 11*x3 == 12]
                 for (x1, x2, x3) in sm.Any)
         r = solvers.solve(system)
-        self.assertAlmostEqual(r['x1'], 0.0)
-        self.assertAlmostEqual(r['x2'], -1.0)
-        self.assertAlmostEqual(r['x3'], -2.0)
+        self.assertAlmostEqual(r[0].right, 0.0)
+        self.assertAlmostEqual(r[1].right, -1.0)
+        self.assertAlmostEqual(r[2].right, -2.0)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,4 @@
 from symbolic import core
-import symbolic as sm
-import functools as ft
 
 
 def get_independent_term_vector(expression_list, var_names):
@@ -75,4 +73,6 @@ def solve(system):
     x = gaussian_elimination(M)
     # Make and return a dict with that contains the name of each solution
     # with their respective value
-    return {name: value for name, value in zip(var_name, x)}
+    result = [core.BinaryRelation(name, '==', value)
+            for name, value in zip(var_name, x)]
+    return result[0] if len(result) == 1 else result

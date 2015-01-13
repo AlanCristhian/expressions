@@ -1,6 +1,6 @@
 import unittest
 from symbolic.core import (MatrixType, argument_sender, CallableObject,
-    ExpressionString)
+    ExpressionString, BinaryRelation)
 
 
 class TestMatrixType(unittest.TestCase):
@@ -153,6 +153,26 @@ class ExpressionTest(unittest.TestCase):
         double = MatrixType(x*2 for x in MatrixType)
         expr = MatrixType(double(y) for y in MatrixType)
         self.assertEqual(expr._expression, 'double(y)')
+
+
+class TestBinaryRelation(unittest.TestCase):
+    def setUp(self):
+        self.ineq = BinaryRelation('x', '<', 5)
+
+    def test_basic_properties(self):
+        self.assertEqual(self.ineq.left, 'x')
+        self.assertEqual(self.ineq.operator, '<')
+        self.assertEqual(self.ineq.right, 5)
+
+    def test__repr__(self):
+        obtained = repr(self.ineq)
+        expected = 'BinaryRelation(x < 5)'
+        self.assertEqual(expected, obtained)
+
+    def test__eq__(self):
+        first = BinaryRelation('x', '>=', 1)
+        second = BinaryRelation('x', '>=', 1)
+        self.assertEqual(first, second)
 
 
 if __name__ == '__main__':

@@ -430,3 +430,27 @@ class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
         assert multiplicant > 0
 
         return MatrixType([self._array for j in range(0, multiplicant)])
+
+
+# The below class is used to represent inequalities and equalities.
+# Not to be confused with "inequation" and "equation".
+
+class BinaryRelation:
+    """Represents a binary relation between two quantities or
+    expressions. For example: `x <= 2`."""
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+
+    def __repr__(self):
+        return 'BinaryRelation(%s %s %s)' % \
+            (self.left, self.operator, self.right)
+
+    def __eq__(self, other):
+        if self.left == other.left \
+        and self.operator == other.operator \
+        and self.right == other.right:
+            return True
+        else:
+            return False
