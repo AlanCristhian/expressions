@@ -1,16 +1,20 @@
-class DictVector(dict):
-    def __init__(self, vector=None):
-        self.vector = vector
-        self.stored = {}
-        self.size = None
+def _get_shape(list_of_lists):
+    """Get the dimension of the matrix."""
+    shape = ()
+    item = list_of_lists[0]
+    if type(item) is list:
+        shape += _get_shape(item)
+    else:
+        shape += (len(list_of_lists),)
+    return shape
+
+
+class Matrix(dict):
+    def __init__(self, iterable=None):
+        if iterable is not None:
+            n = len(iterable)
+            for item in iterable:
+                pass
 
     def __getitem__(self, key):
-        if key in self.stored.keys():
-            return self.stored[key]
-        else:
-            value = self.vector[key]
-            self.vector[key] = None
-            self.stored[key] = value
-            if not any(self.vector):
-                del self.vector
-            return value
+        pass
