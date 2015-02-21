@@ -1,3 +1,6 @@
+import re
+import itertools as it
+
 from symbolic import core
 
 
@@ -40,29 +43,41 @@ def expanded_coefficients_matrix(system):
     return [[eval(item) for item in row] for row in coeff_column_expr]
 
 
-# Gaussian elimination algorithm by Isaac Evans.
-# github.com/ievans/GaussianElimination/blob/master/gaussianelimination.py
+# Thanks to Martin Thoma
+# http://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
+def gaussian_elimination(A):
+    n = len(A)
 
-def gaussian_elimination(m):
-    # eliminate columns
-    for col in range(len(m[0])):
-        for row in range(col+1, len(m)):
-            r = (-m[row][col] / m[col][col] * rowValue for rowValue in m[col])
-            m[row] = [sum(pair) for pair in zip(m[row], r)]
-    # now backsolve by substitution
-    ans = []
-    m.reverse() # makes it easier to backsolve
-    for sol in range(len(m)):
-        if sol == 0:
-            ans.append(m[sol][-1] / m[sol][-2])
-        else:
-            # substitute in all known coefficients
-            inner = sum(ans[x]*m[sol][-2-x] for x in range(sol))
-            # the equation is now reduced to ax + b = c form
-            # solve with (c - b) / a
-            ans.append((m[sol][-1]-inner)/m[sol][-sol-2])
-    ans.reverse()
-    return ans
+    for i in range(0, n):
+        # Search for maximum in this column
+        maxEl = abs(A[i][i])
+        maxRow = i
+        for k in range(i+1, n):
+            if abs(A[k][i]) > maxEl:
+                maxEl = abs(A[k][i])
+                maxRow = k
+
+        # Swap maximum row with current row (column by column)
+        for k in range(i, n+1):
+            A[i][k], A[maxRow][k] = A[maxRow][k], A[i][k]
+
+        # Make all rows below this one 0 in current column
+        for k in range(i+1, n):
+            c = -A[k][i]/A[i][i]
+            for j in range(i, n+1):
+                if i == j:
+                    A[k][j] = 0
+                else:
+                    A[k][j] += c * A[i][j]
+
+    # Solve equation Ax=b for an upper triangular matrix A
+    x = [0 for i in range(n)]
+    for i in range(n-1, -1, -1):
+        x[i] = A[i][n]/A[i][i]
+        for k in range(i-1, -1, -1):
+            A[k][n] -= A[k][i] * x[i]
+    return x
+
 
 
 def solve(system):
@@ -76,3 +91,24 @@ def solve(system):
     result = [core.BinaryRelation(name, '==', value)
             for name, value in zip(var_name, x)]
     return result[0] if len(result) == 1 else result
+
+
+def get_expression_list(expression):
+    pattern = re.compile('''
+    (
+        -[a-zA-Z0-9\*\/\.]+     # A MINUS character folowed by letters,
+                                # numbers, asterisc, backslash and point.
+
+        |\+[a-zA-Z0-9\*\/\.]+   # A PLUS character folowed by letters,
+                                # numbers, asterisc, backslash and point.
+
+        |==                     # the equality operator
+    )''', re.VERBOSE)
+    without_spaces = expression.replace(' ', '')
+    splitted = pattern.split(without_spaces)
+    filtered = filter(None, splitted)
+    return list(filtered)
+
+
+# TODO: replace the comparisson operator string with an object that
+# represente such operator.
