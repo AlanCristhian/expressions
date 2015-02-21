@@ -1,6 +1,6 @@
 import unittest
 from symbolic.core import (MatrixType, argument_sender, CallableObject,
-    ExpressionString, BinaryRelation)
+    ExpressionString, BinaryRelation, EqualOperator)
 
 
 class TestMatrixType(unittest.TestCase):
@@ -71,7 +71,7 @@ class ExpressionTest(unittest.TestCase):
         le = MatrixType(x<=2 for x in MatrixType)
         lshift = MatrixType(x<<2 for x in MatrixType)
         lt = MatrixType(x<2 for x in MatrixType)
-        # matmul = MatrixType(x@2 for x in MatrixType)
+        matmul = MatrixType(x@2 for x in MatrixType)
         mod = MatrixType(x%2 for x in MatrixType)
         mul = MatrixType(x*2 for x in MatrixType)
         ne = MatrixType(x!=2 for x in MatrixType)
@@ -92,7 +92,7 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(le._expression, 'x<=(2)')
         self.assertEqual(lshift._expression, 'x<<(2)')
         self.assertEqual(lt._expression, 'x<(2)')
-        # self.assertEqual(matmul._expression, 'x@(2)')
+        self.assertEqual(matmul._expression, 'x@(2)')
         self.assertEqual(mod._expression, 'x%(2)')
         self.assertEqual(mul._expression, 'x*(2)')
         self.assertEqual(ne._expression, 'x!=(2)')
@@ -109,7 +109,7 @@ class ExpressionTest(unittest.TestCase):
         rdiv = MatrixType(2/x for x in MatrixType)
         rfloordiv = MatrixType(2//x for x in MatrixType)
         rlshift = MatrixType(2<<x for x in MatrixType)
-        # rmatmul = MatrixType(2@x for x in MatrixType)
+        rmatmul = MatrixType(2@x for x in MatrixType)
         rmod = MatrixType(2%x for x in MatrixType)
         rmul = MatrixType(2*x for x in MatrixType)
         ror_ = MatrixType(2|x for x in MatrixType)
@@ -124,7 +124,7 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(rdiv._expression, '(2)/x')
         self.assertEqual(rfloordiv._expression, '(2)//x')
         self.assertEqual(rlshift._expression, '(2)<<x')
-        # self.assertEqual(rmatmul._expression, '(2)@x')
+        self.assertEqual(rmatmul._expression, '(2)@x')
         self.assertEqual(rmod._expression, '(2)%x')
         self.assertEqual(rmul._expression, '(2)*x')
         self.assertEqual(ror_._expression, '(2)|x')
