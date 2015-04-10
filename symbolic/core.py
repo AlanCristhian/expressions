@@ -1,5 +1,5 @@
-"""A library with base classes and metaclasses that let define
-numeric sets."""
+"""A library with base classes and metaclasses that let medefine
+numeric sets and some mathematical expressions."""
 
 
 import inspect
@@ -8,16 +8,28 @@ import traceback
 from . import helpers
 
 
-# Make an AST with the generator expression
-# =========================================
+"""
+Get the output expression of the generator expression
+=====================================================
 
-# Python have the ast module. This library have the ast.parse(source) funtion
-# that parse the source into an AST node, where source is an string. See the
-# example:
-# >>> y = (x*y for (x, y) in range(2))
-# To reuse the ast.parse funtion I need to extract the 'x*y' string from the
-# generator object.
+A generator expression consists of the following parts:
 
+ - An Input Sequence.
+ - A Variable representing members of the input sequence.
+ - An Optional Predicate expression.
+ - An Output Expression producing elements of the output list from
+   members of the Input Sequence that satisfy the predicate.
+
+Consider the folowing example:
+>>> (2*x for x in range(5) if x > 3)
+
+The `2*x` part is the `output expression`, `x` is the variable,
+`range(5)` is the `input sequence` and `if x > 3` is the
+`optional predicate`.
+
+So, I want to have an str with the `output expression` of the
+`generator expression`. The code below do that.
+"""
 
 _BINARY_LEFT_OPERATOR = [
     ('__add__', '%s+(%s)'),
@@ -67,40 +79,48 @@ _UNARY_OPERATOR = [
 
 
 def _binary_left_operator(template):
+    """Return a function that make an expression string with a binary
+    left operator."""
     def operator(self, other):
         result = ExpressionString()
-        if hasattr(other, '_expression'):
-            result._expression = template % \
-                (self._expression, other._expression)
+        if hasattr(other, 'expression'):
+            result.expression = template % \
+                (self.expression, other.expression)
         else:
-            result._expression = template % \
-                (self._expression, repr(other))
+            result.expression = template % \
+                (self.expression, repr(other))
         return result
     return operator
 
 
 def _binary_right_operator(template):
+    """Return a function that make an expression string with an
+    binary operator placed at the right of the variable."""
     def operator(self, other):
         result = ExpressionString()
-        if hasattr(other, '_expression'):
-            result._expression = template % \
-                (other._expression, self._expression)
+        if hasattr(other, 'expression'):
+            result.expression = template % \
+                (other.expression, self.expression)
         else:
-            result._expression = template % \
-                (repr(other), self._expression)
+            result.expression = template % \
+                (repr(other), self.expression)
         return result
     return operator
 
 
 def _unary_operator(template):
+    """Return a function that make an expression
+    string with an unary operator."""
     def operator(self):
         result = ExpressionString()
-        result._expression = template % self._expression
+        result.expression = template % self.expression
         return result
     return operator
 
 
-class ExpressionMeta(type):
+class _DefineAllOperatorsMeta(type):
+    """All operators of the new class will return an string that
+    represent the mathematical expression."""
     def __new__(cls, name, bases, namespace):
         namespace.update({function: _binary_left_operator(template) for \
                           function, template in _BINARY_LEFT_OPERATOR})
@@ -112,24 +132,26 @@ class ExpressionMeta(type):
         return new_class
 
 
-class ExpressionString(metaclass=ExpressionMeta):
-    """All magick methods make an string."""
+class ExpressionString(metaclass=_DefineAllOperatorsMeta):
+    """Create an symbolic variable."""
     def __init__(self, name=None):
         if name is not None:
-            self._expression = name
+            self.expression = name
 
     def __repr__(self):
-        return self._expression
+        return self.expression
 
 
-# Make a vector
-# =============
+"""
+Make a vector
+=============
 
-# Supose that I wish to define a vector with the below sintax:
-# >>> v = Any**3
-# The upper expression mean that `v` is a 3-vector with Any numbers. The 
-# VectorMeta metaclass add this feature to the `Any` class through
-# the `VectorMeta.__pow__()` method.
+Supose that I wish to define a vector with the below sintax:
+>>> v = Real**3
+The upper expression mean that `v` is a 3-vector with Real numbers. The
+VectorMeta metaclass add this feature to the `Real` class through
+the `VectorMeta.__pow__()` method.
+"""
 
 class VectorMeta(type):
     """Add `NumericType**N` API interface for to make an N-vector with
@@ -146,20 +168,23 @@ class VectorMeta(type):
         return cls([0 for i in range(0, exponent)])
 
 
-# Make a function with the generator expression
-# =============================================
+"""
+Make a function with the generator expression
+=============================================
 
-# I want to define a function that do type checking of arguments and values
-# returned. All those with generator-expressions. E.g:
+I want to define a function that do type checking of arguments and values
+returned. All those with generator-expressions. E.g:
 
-# >>> double = Any(2*x for x in Any)
-# >>> double(4)
-# 8
+>>> double = Real(2*x for x in Real)
+>>> double(4)
+double(4)
+>>> next(double(4))
+8
 
-# How I can implement this thing?
+How I can implement this thing?
+"""
 
-
-# The argument_sender() coroutine-object will be store the values passed
+# FIRST: The argument_sender() coroutine-object will be store the values passed
 # with the .send() method. I will use this values as function arguments later.
 # Then yield the value like a producer.
 
@@ -167,13 +192,13 @@ def argument_sender():
     value = None
     while True:
         # If I not yield the value, the following line return the None value.
-        # This value can cause some problems inside the generator expression.
+        # None value can cause some problems inside the generator expression.
         value = yield value
         yield value
 
 
-# Second, to build the generator-expression, Python3 need that the
-# expression-list in the for statement in the generator-expression have the
+# SECOND, to build the generator-expression, Python3 need that the
+# `input sequence` object in the generator-expression have the
 # .__iter__() method. This method should return an iterable. The IterableMeta
 # metaclass do that.
 
@@ -185,6 +210,8 @@ class IterableMeta(type):
     def __iter__(cls):
         # !!!: the iter method return the argument_sender() coroutine-object
         sender = argument_sender()
+        # To get a co-routine to run properly, you have to
+        # ping it with a next() operation first
         next(sender)
         return sender
 
@@ -226,7 +253,7 @@ class NamedObject:
     def __name__(self):
         """Find the name of the instance of the current class.
         Then store it in the .__name__ attribute."""
-        # NOTE: If you use this class in the interactive IDLE shell, the 
+        # NOTE: If you use this class in the interactive IDLE shell, the
         # `helpers.get_name()` function return `None`. So, I find the name of
         # the var in the global namespace of each frame.
         if self._name is None:
@@ -244,7 +271,7 @@ class NamedObject:
 class CalledObject:
     def __init__(self, generator, name, args):
         self._generator = generator
-        self._expression = name + repr(args).replace(',)', ')')
+        self.expression = name + repr(args).replace(',)', ')')
 
     def __iter__(self):
         return self._generator.__iter__
@@ -266,7 +293,7 @@ class CalledObject:
         return self._generator.gi_running
 
     def __repr__(self):
-        return self._expression
+        return self.expression
 
 
 # Third, I use the coroutine-object returned by the __iter__() method to pass
@@ -281,7 +308,7 @@ class CallableObject(NamedObject):
 
     def _make_expression(self):
         """Send an ExpressionString() object to the generator. Then
-        return the object with the "_expression" property."""
+        return the object with the ".expression" property."""
         # CAVEAT: everything the first var name in gi_code.co_varnames is "0.0"
         # This is the name of the iterator used in the first *for* statement
         # in the generator.
@@ -290,9 +317,9 @@ class CallableObject(NamedObject):
         return next(expr_obj)
 
     @helpers.cached_property
-    def _expression(self):
+    def expression(self):
         obj = self._make_expression()
-        return obj._expression if hasattr(obj, '_expression') \
+        return obj.expression if hasattr(obj, 'expression') \
         else self.__name__
 
     def __call__(self, *args):

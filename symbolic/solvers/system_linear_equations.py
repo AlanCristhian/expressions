@@ -15,10 +15,10 @@ def get_independent_term_vector(expression_list, var_names):
 
 def expanded_coefficients_matrix(system):
     # make a list of equalities
-    equalities = system._expression if type(system._expression) is list \
-        else [system._expression]
+    equalities = system.expression if type(system.expression) is list \
+        else [system.expression]
     # transform each equality in an expression
-    expression_list = [item._expression.replace("==","-(") + ")" for item in equalities]
+    expression_list = [item.expression.replace("==","-(") + ")" for item in equalities]
     # the list of names of each variable
     var_names = system._generator.gi_code.co_varnames[1:]
 

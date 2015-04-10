@@ -13,7 +13,7 @@ class Test_cached_property(unittest.TestCase):
                 self.called = True
                 return 'my_property'
         self.obj = Any()
-        
+
     def test_non_getted_property(self):
         self.assertTrue('my_property' in dir(self.obj))
         self.assertFalse(self.obj.called)

@@ -1,7 +1,6 @@
 # symbolic
 
-An experimental library that allow your define sympy symbolic with
- **declarative syntax**.
+An experimental library that allow your define mathematical expressions.
 
 ## Matrix definition
 
@@ -11,7 +10,7 @@ You can define vectors and matrix whit an natural sintax:
 >>> from symbolic import Real
 >>> v = Real**3
 >>> v
-Real([0, 0, 0])
+v ∊ Real**3
 >>> u = Real([1, 2, 3])
 >>> u
 Real([1, 2, 3])
@@ -25,10 +24,10 @@ Real([1, 555, 3])
 Below is the sintax to define a matrix:
 
 ```python
->>> from symbolic.types import Real
+>>> from symbolic import Real
 >>> A = Real**3*3
 >>> A
-Real([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+A ∊ Real**3*3
 >>> I = Real([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 >>> I[2][1]
 0
@@ -39,23 +38,13 @@ Real([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 For example, in the quadratic formula, the expression underneath the square
 root sign is the discriminant of the quadratic equation, and is defined as:
 
-`Δ: D ⊂ ℝ³ → ℝ = {b² - 4ac | (a, b, c) ∊ ℝ³}`
+`Δ: D ⊂ ℝ³ → ℝ and Δ(a, b, c) = b² - 4ac`
 
 The above mathematical expression can be writed with the following notation in
 Python:
 
 ```python
 discriminant = Real(b**2 - 4*a*c for (a, b, c) in Real**3)
-```
-
-The `Real` class in `symbolic` module translate the *generator expression*
-to the function:
-
-```python
-def function_expression():
-    a, b, c = sympy.Symbol('a b c', real=True)
-    return b**2 - 4*a*c
-delta = function_expression()
 ```
 
 Below is the complete example written in Python:
@@ -67,8 +56,20 @@ Below is the complete example written in Python:
 delta(1, 2, 3)
 >>> next(delta(1, 2, 3))
 -8
->>> delta.subs([(a, 1), (b, 2), (c, 3)])
--8
+```
+
+
+#### System of equalities
+
+```python
+>>> from symbolic import System, Real
+>>> system = System([
+...      -x1 +  2*x2 -  3*x3 ==  4,
+...     5*x1 -  6*x2 +  7*x3 == -8,
+...     9*x1 + 10*x2 - 11*x3 == 12]
+...         for (x1, x2, x3) in Real**3)
+>>> system.solve()
+SystemSolution(('x1', '==', 0.0), ('x2', '==', -1.0), ('x3', '==', -2.0))
 ```
 
 #### Domain of a function (not yet implemented)
@@ -76,10 +77,10 @@ delta(1, 2, 3)
 The you can define the domain of a function. E.g: `D` is cilinder with
 `height = 2` and `radius = 1` and is paralell to `z` axis:
 
-`D = {(x, y, z) ∊ ℝ³, 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
+`D = {(x, y, z) ∀ (x, y, z) ∊ ℝ³ | 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
 
 Is translated to Python3 as:
 
 ```python
-D = Real**3((x, y, z) for (x, y, z) in Real**3 if 0 <= x <= 2 if 0 <= y**2 + z**2 <= 1)
+D = Domain((x, y, z) for (x, y, z) in Real**3 if 0 <= x <= 2 if 0 <= y**2 + z**2 <= 1)
 ```

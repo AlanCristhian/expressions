@@ -16,7 +16,7 @@ class System(core.CallableObject):
     equalities."""
     def __init__(self, system, *args, **kwds):
         super().__init__(system, *args, **kwds)
-        self._expression = super()._make_expression()
+        self.expression = super()._make_expression()
 
     def __setitem__(self, key, value):
         return self._array.__setitem__(key, value)
