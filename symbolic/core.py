@@ -19,48 +19,100 @@ from . import helpers
 # generator object.
 
 
+_BINARY_LEFT_OPERATOR = [
+    ('__add__', '%s+(%s)'),
+    ('__and__', '%s&(%s)'),
+    ('__div__', '%s/(%s)'),
+    ('__eq__', '%s==(%s)'),
+    ('__floordiv__', '%s//(%s)'),
+    ('__ge__', '%s>=(%s)'),
+    ('__gt__', '%s>(%s)'),
+    ('__le__', '%s<=(%s)'),
+    ('__lshift__', '%s<<(%s)'),
+    ('__lt__', '%s<(%s)'),
+    ('__matmul__', '%s@(%s)'),
+    ('__mod__', '%s%%(%s)'),
+    ('__mul__', '%s*(%s)'),
+    ('__ne__', '%s!=(%s)'),
+    ('__or__', '%s|(%s)'),
+    ('__pow__', '%s**(%s)'),
+    ('__rshift__', '%s>>(%s)'),
+    ('__sub__', '%s-(%s)'),
+    ('__truediv__', '%s/(%s)'),
+    ('__xor__', '%s^(%s)'),
+]
+
+_BINARY_RIGHT_OPERATOR = [
+    ('__radd__', '(%s)+%s'),
+    ('__rand__', '(%s)&%s'),
+    ('__rdiv__', '(%s)/%s'),
+    ('__rfloordiv__', '(%s)//%s'),
+    ('__rlshift__', '(%s)<<%s'),
+    ('__rmatmul__', '(%s)@%s'),
+    ('__rmod__', '(%s)%%%s'),
+    ('__rmul__', '(%s)*%s'),
+    ('__ror__', '(%s)|%s'),
+    ('__rpow__', '(%s)**%s'),
+    ('__rrshift__', '(%s)>>%s'),
+    ('__rsub__', '(%s)-%s'),
+    ('__rtruediv__', '(%s)/%s'),
+    ('__rxor__', '(%s)^%s'),
+]
+
+_UNARY_OPERATOR = [
+    ('__invert__', '~(%s)'),
+    ('__neg__', '-(%s)'),
+    ('__pos__', '+(%s)'),
+]
+
+
 def _binary_left_operator(template):
-    def decorator(function):
-        def operator(self, other):
-            result = ExpressionString()
-            if hasattr(other, '_expression'):
-                result._expression = template % \
-                    (self._expression, other._expression)
-            else:
-                result._expression = template % \
-                    (self._expression, repr(other))
-            return result
-        return operator
-    return decorator
+    def operator(self, other):
+        result = ExpressionString()
+        if hasattr(other, '_expression'):
+            result._expression = template % \
+                (self._expression, other._expression)
+        else:
+            result._expression = template % \
+                (self._expression, repr(other))
+        return result
+    return operator
 
 
 def _binary_right_operator(template):
-    def decorator(function):
-        def operator(self, other):
-            result = ExpressionString()
-            if hasattr(other, '_expression'):
-                result._expression = template % \
-                    (other._expression, self._expression)
-            else:
-                result._expression = template % \
-                    (repr(other), self._expression)
-            return result
-        return operator
-    return decorator
+    def operator(self, other):
+        result = ExpressionString()
+        if hasattr(other, '_expression'):
+            result._expression = template % \
+                (other._expression, self._expression)
+        else:
+            result._expression = template % \
+                (repr(other), self._expression)
+        return result
+    return operator
 
 
 def _unary_operator(template):
-    def decorator(function):
-        def operator(self):
-            result = ExpressionString()
-            result._expression = template % self._expression
-            return result
-        return operator
-    return decorator
+    def operator(self):
+        result = ExpressionString()
+        result._expression = template % self._expression
+        return result
+    return operator
 
 
-# !!!: maybe exists an better way to implement this behaviour
-class ExpressionString:
+class ExpressionMeta(type):
+    def __new__(cls, name, bases, namespace):
+        namespace.update({function: _binary_left_operator(template) for \
+                          function, template in _BINARY_LEFT_OPERATOR})
+        namespace.update({function: _binary_right_operator(template) for \
+                          function, template in _BINARY_RIGHT_OPERATOR})
+        namespace.update({function: _unary_operator(template) for \
+                          function, template in _UNARY_OPERATOR})
+        new_class = super().__new__(cls, name, bases, namespace)
+        return new_class
+
+
+class ExpressionString(metaclass=ExpressionMeta):
     """All magick methods make an string."""
     def __init__(self, name=None):
         if name is not None:
@@ -68,267 +120,6 @@ class ExpressionString:
 
     def __repr__(self):
         return self._expression
-
-    @_binary_left_operator('%s+(%s)')
-    def __add__(self, other):
-        pass
-
-    @_binary_left_operator('%s&(%s)')
-    def __and__(self, other):
-        pass
-
-    @_binary_left_operator('%s/(%s)')
-    def __div__(self, other):
-        pass
-
-    @_binary_left_operator('%s==(%s)')
-    def __eq__(self, other):
-        pass
-
-    @_binary_left_operator('%s//(%s)')
-    def __floordiv__(self, other):
-        pass
-
-    @_binary_left_operator('%s>=(%s)')
-    def __ge__(self, other):
-        pass
-
-    @_binary_left_operator('%s>(%s)')
-    def __gt__(self, other):
-        pass
-
-    @_binary_left_operator('%s<=(%s)')
-    def __le__(self, other):
-        pass
-
-    @_binary_left_operator('%s<<(%s)')
-    def __lshift__(self, other):
-        pass
-
-    @_binary_left_operator('%s<(%s)')
-    def __lt__(self, other):
-        pass
-
-    @_binary_left_operator('%s@(%s)')
-    def __matmul__(self, other):
-        pass
-
-    @_binary_left_operator('%s%%(%s)')
-    def __mod__(self, other):
-        pass
-
-    @_binary_left_operator('%s*(%s)')
-    def __mul__(self, other):
-        pass
-
-    @_binary_left_operator('%s!=(%s)')
-    def __ne__(self, other):
-        pass
-
-    @_binary_left_operator('%s|(%s)')
-    def __or__(self, other):
-        pass
-
-    @_binary_left_operator('%s**(%s)')
-    def __pow__(self, other):
-        pass
-
-    @_binary_left_operator('%s>>(%s)')
-    def __rshift__(self, other):
-        pass
-
-    @_binary_left_operator('%s-(%s)')
-    def __sub__(self, other):
-        pass
-
-    @_binary_left_operator('%s/(%s)')
-    def __truediv__(self, other):
-        pass
-
-    @_binary_left_operator('%s^(%s)')
-    def __xor__(self, other):
-        pass
-
-    # --------------------------------
-
-    @_binary_right_operator('(%s)+%s')
-    def __radd__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)&%s')
-    def __rand__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)/%s')
-    def __rdiv__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)//%s')
-    def __rfloordiv__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)<<%s')
-    def __rlshift__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)@%s')
-    def __rmatmul__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)%%%s')
-    def __rmod__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)*%s')
-    def __rmul__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)|%s')
-    def __ror__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)**%s')
-    def __rpow__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)>>%s')
-    def __rrshift__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)-%s')
-    def __rsub__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)/%s')
-    def __rtruediv__(self, other):
-        pass
-
-    @_binary_right_operator('(%s)^%s')
-    def __rxor__(self, other):
-        pass
-
-    # --------------------------------
-
-    @_unary_operator('~(%s)')
-    def __invert__(self):
-        pass
-
-    @_unary_operator('-(%s)')
-    def __neg__(self):
-        pass
-
-    @_unary_operator('+(%s)')
-    def __pos__(self):
-        pass
-
-
-# _BINARY_LEFT_OPERATOR = [
-#     ('__add__', '%s+(%s)'),
-#     ('__and__', '%s&(%s)'),
-#     ('__div__', '%s/(%s)'),
-#     ('__eq__', '%s==(%s)'),
-#     ('__floordiv__', '%s//(%s)'),
-#     ('__ge__', '%s>=(%s)'),
-#     ('__gt__', '%s>(%s)'),
-#     ('__le__', '%s<=(%s)'),
-#     ('__lshift__', '%s<<(%s)'),
-#     ('__lt__', '%s<(%s)'),
-#     ('__matmul__', '%s@(%s)'),
-#     ('__mod__', '%s%%(%s)'),
-#     ('__mul__', '%s*(%s)'),
-#     ('__ne__', '%s!=(%s)'),
-#     ('__or__', '%s|(%s)'),
-#     ('__pow__', '%s**(%s)'),
-#     ('__rshift__', '%s>>(%s)'),
-#     ('__sub__', '%s-(%s)'),
-#     ('__truediv__', '%s/(%s)'),
-#     ('__xor__', '%s^(%s)'),
-# ]
-
-# _BINARY_RIGHT_OPERATOR = [
-#     ('__radd__', '(%s)+%s'),
-#     ('__rand__', '(%s)&%s'),
-#     ('__rdiv__', '(%s)/%s'),
-#     ('__rfloordiv__', '(%s)//%s'),
-#     ('__rlshift__', '(%s)<<%s'),
-#     ('__rmatmul__', '(%s)@%s'),
-#     ('__rmod__', '(%s)%%%s'),
-#     ('__rmul__', '(%s)*%s'),
-#     ('__ror__', '(%s)|%s'),
-#     ('__rpow__', '(%s)**%s'),
-#     ('__rrshift__', '(%s)>>%s'),
-#     ('__rsub__', '(%s)-%s'),
-#     ('__rtruediv__', '(%s)/%s'),
-#     ('__rxor__', '(%s)^%s'),
-# ]
-
-# _UNARY_OPERATOR = [
-#     ('__invert__', '~(%s)'),
-#     ('__neg__', '-(%s)'),
-#     ('__pos__', '+(%s)'),
-# ]
-
-
-# def _binary_left_operator(function, template):
-#     def operator(self, other):
-#         result = ExpressionString()
-#         if hasattr(other, '_expression'):
-#             result._expression = template % \
-#                 (self._expression, other._expression)
-#         else:
-#             result._expression = template % \
-#                 (self._expression, repr(other))
-#         return result
-#     return operator
-
-
-# def _binary_right_operator(function, template):
-#     def operator(self, other):
-#         result = ExpressionString()
-#         if hasattr(other, '_expression'):
-#             result._expression = template % \
-#                 (other._expression, self._expression)
-#         else:
-#             result._expression = template % \
-#                 (repr(other), self._expression)
-#         return result
-#     return operator
-
-
-# def _unary_operator(function, template):
-#     def operator(self):
-#         result = ExpressionString()
-#         result._expression = template % self._expression
-#         return result
-#     return operator
-
-
-# class ExpressionMeta(type):
-#     def __new__(cls, name, bases, namespace):
-#         namespace.update({function: template for function, template in
-#                           _BINARY_LEFT_OPERATOR})
-#         namespace.update({function: template for function, template in
-#                           _BINARY_RIGHT_OPERATOR})
-#         namespace.update({function: template for function, template in
-#                           _UNARY_OPERATOR})
-#         new_cls = super().__new__(cls, name, bases, namespace)
-#         # for function, template in _BINARY_LEFT_OPERATOR:
-#         #     setattr(new_cls, function, _binary_left_operator(function, template))
-#         # for function, template in _BINARY_RIGHT_OPERATOR:
-#         #     setattr(new_cls, function, _binary_right_operator(function, template))
-#         # for function, template in _UNARY_OPERATOR:
-#         #     setattr(new_cls, function, _unary_operator(function, template))
-#         return new_cls
-
-
-# class ExpressionString(metaclass=ExpressionMeta):
-#     """All magick methods make an string."""
-#     def __init__(self, name=None):
-#         if name is not None:
-#             self._expression = name
-
-#     def __repr__(self):
-#         return self._expression
 
 
 # Make a vector
@@ -416,7 +207,7 @@ class NamedObject:
     def _get_name(self):
         """Find the name of the instance of the current class.
         Then store it in the .__name__ attribute."""
-        *_, text = traceback.extract_stack()[-5]
+        *_, text = traceback.extract_stack()[-6]
         if text:
             name, *_ = text.split('=')
             return name.strip()
