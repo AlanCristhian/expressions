@@ -143,7 +143,7 @@ class ExpressionTest(unittest.TestCase):
         self.assertEqual(neg.expression, '-(x)')
         self.assertEqual(pos.expression, '+(x)')
 
-    def test___name__property(self):
+    def test__name__property(self):
         """The MatrixType() instance shoud have the __name__ property."""
         named_lambda = MatrixType(+x for x in MatrixType)
         self.assertEqual(named_lambda.__name__, 'named_lambda')

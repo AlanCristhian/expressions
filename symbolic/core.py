@@ -5,7 +5,7 @@ numeric sets and some mathematical expressions."""
 import inspect
 import traceback
 
-from . import helpers
+from symbolic import utils
 
 
 """
@@ -14,11 +14,11 @@ Get the output expression of the generator expression
 
 A generator expression consists of the following parts:
 
- - An Input Sequence.
- - A Variable representing members of the input sequence.
- - An Optional Predicate expression.
- - An Output Expression producing elements of the output list from
-   members of the Input Sequence that satisfy the predicate.
+- An Input Sequence.
+- A Variable representing members of the input sequence.
+- An Optional Predicate expression.
+- An Output Expression producing elements of the output list from
+  members of the Input Sequence that satisfy the predicate.
 
 Consider the folowing example:
 >>> (2*x for x in range(5) if x > 3)
@@ -30,6 +30,7 @@ The `2*x` part is the `output expression`, `x` is the variable,
 So, I want to have an str with the `output expression` of the
 `generator expression`. The code below do that.
 """
+
 
 _BINARY_LEFT_OPERATOR = [
     ('__add__', '%s+(%s)'),
@@ -146,7 +147,7 @@ class ExpressionString(metaclass=_DefineAllOperatorsMeta):
 Make a vector
 =============
 
-Supose that I wish to define a vector with the below sintax:
+Supose that I want to define a vector with the below sintax:
 >>> v = Real**3
 The upper expression mean that `v` is a 3-vector with Real numbers. The
 VectorMeta metaclass add this feature to the `Real` class through
@@ -170,7 +171,8 @@ Make a function with the generator expression
 =============================================
 
 I want to define a function that do type checking of arguments and values
-returned. All those with generator-expressions. E.g:
+returned. Also, I want that the the funtion to be lazy. All those with
+generator-expressions. E.g:
 
 >>> double = Real(2*x for x in Real)
 >>> double(4)
@@ -210,14 +212,8 @@ class IterableMeta(type):
         return sender
 
 
-# Join IterableMeta and VectorMeta
 class IterableAndVectorMeta(IterableMeta, VectorMeta):
-    pass
-
-
-
-# Variables with the .__name__ property
-# =====================================
+    """All behaviours of IterableMeta and VectorMeta in one."""
 
 
 class NamedObject:
@@ -241,14 +237,14 @@ class NamedObject:
             frame = frame.f_back
 
     # NOTE: I define the __name__ property as a method because I need to store
-    # the name after object creation. The @helpers.cached_property decorator
+    # the name after object creation. The @utils.cached_property decorator
     # call the __name__ method and then transform itself into a property.
-    @helpers.cached_property
+    @utils.cached_property
     def __name__(self):
         """Find the name of the instance of the current class.
         Then store it in the .__name__ attribute."""
         # NOTE: If you use this class in the interactive IDLE shell, the
-        # `helpers.get_name()` function return `None`. So, I find the name of
+        # `utils.get_name()` function return `None`. So, I find the name of
         # the var in the global namespace of each frame.
         if self._name is None:
             global_variables = self._get_outer_globals(inspect.currentframe())
@@ -263,6 +259,7 @@ class NamedObject:
 
 
 class CalledObject:
+    """This object is created when you call the the function."""
     def __init__(self, generator, name, args):
         self._generator = generator
         self.expression = name + repr(args).replace(',)', ')')
@@ -282,7 +279,7 @@ class CalledObject:
     def throw(self):
         return self._generator.throw()
 
-    @helpers.cached_property
+    @utils.cached_property
     def gi_running(self):
         return self._generator.gi_running
 
@@ -310,7 +307,7 @@ class CallableObject(NamedObject):
             for name in self._generator.gi_code.co_varnames[1:]))
         return next(expr_obj)
 
-    @helpers.cached_property
+    @utils.cached_property
     def expression(self):
         obj = self._make_expression()
         return obj.expression if hasattr(obj, 'expression') \

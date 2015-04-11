@@ -1,6 +1,6 @@
 import unittest
 
-from symbolic import helpers
+from symbolic import utils
 
 
 class Test_cached_property(unittest.TestCase):
@@ -8,7 +8,7 @@ class Test_cached_property(unittest.TestCase):
         class Any:
             def __init__(self):
                 self.called = False
-            @helpers.cached_property
+            @utils.cached_property
             def my_property(self):
                 self.called = True
                 return 'my_property'
