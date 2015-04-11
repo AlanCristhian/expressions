@@ -157,9 +157,6 @@ class VectorMeta(type):
     """Add `NumericType**N` API interface for to make an N-vector with
     components of `NumericType` type.
     """
-    def __new__(cls, name, bases, namespace):
-        return super().__new__(cls, name, bases, namespace)
-
     def __pow__(cls, exponent):
         """Make an N-vector of `cls` type with N = `exponent`."""
         assert type(exponent) is int
@@ -204,9 +201,6 @@ def argument_sender():
 
 class IterableMeta(type):
     """Make a class that is an iterable object."""
-    def __new__(cls, name, bases, namespace):
-        return super().__new__(cls, name, bases, namespace)
-
     def __iter__(cls):
         # !!!: the iter method return the argument_sender() coroutine-object
         sender = argument_sender()
