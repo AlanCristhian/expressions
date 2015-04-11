@@ -33,7 +33,7 @@ A ∊ Real**3*3
 0
 ```
 
-# Functions
+## Functions
 
 For example, in the quadratic formula, the expression underneath the square
 root sign is the discriminant of the quadratic equation, and is defined as:
@@ -58,8 +58,17 @@ delta(1, 2, 3)
 -8
 ```
 
+Also you can do early evaluation with the `.eval()` method:
 
-#### System of equalities
+```python
+>>> from symbolic import Real
+>>> delta = Real(b**2 - 4*a*c for (a, b, c) in Real**3)
+>>> delta.eval(1, 2, 3)
+-8
+```
+
+
+## System of equalities
 
 ```python
 >>> from symbolic import System, Real
@@ -69,10 +78,10 @@ delta(1, 2, 3)
 ...     9*x1 + 10*x2 - 11*x3 == 12]
 ...         for (x1, x2, x3) in Real**3)
 >>> system.solve()
-SystemSolution(('x1', '==', 0.0), ('x2', '==', -1.0), ('x3', '==', -2.0))
+(BinaryRelation(x1 == 0.0), BinaryRelation(x2 == -1.0), BinaryRelation(x3 == -2.0))
 ```
 
-#### Domain of a function (not yet implemented)
+## Domain of a function (not yet implemented)
 
 The you can define the domain of a function. E.g: `D` is cilinder with
 `height = 2` and `radius = 1` and is paralell to `z` axis:

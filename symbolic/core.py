@@ -321,6 +321,9 @@ class CallableObject(NamedObject):
         # avance the generator and return their value
         return CalledObject(self._generator, self.__name__, args)
 
+    def eval(self, *args):
+        return next(self(*args))
+
 
 # Make a matrix
 # =============

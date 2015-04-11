@@ -58,6 +58,14 @@ class FunctionTest(unittest.TestCase):
         added = add(3, 4)
         self.assertEqual(7, next(added))
 
+    def test_eval_method(self):
+        cube = MatrixType(x**3 for x in MatrixType)
+        self.assertEqual(27, cube.eval(3))
+
+    def test_eval_method_with_many_variables(self):
+        pow = MatrixType(x**y for (x, y) in MatrixType)
+        self.assertEqual(27, pow.eval(3, 3))
+
 
 class ExpressionTest(unittest.TestCase):
     def test_bynary_left_operators(self):
