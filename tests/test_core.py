@@ -58,6 +58,18 @@ class FunctionTest(unittest.TestCase):
         added = add(3, 4)
         self.assertEqual(7, next(added))
 
+    def test_CallableObject_string(self):
+        """Should make a correct code if use some CallableObject object."""
+        double = MatrixType(x*2 for x in MatrixType)
+        expr = MatrixType(double(y) for y in MatrixType)
+        self.assertEqual(expr.expression, 'double(y)')
+
+    def test_CallableObject_string_with_many_variables(self):
+        """Should make a correct code if use some CallableObject object."""
+        add = MatrixType(x + y for (x, y) in MatrixType)
+        expr = MatrixType(add(x, y) + add(1, 2) for (x, y) in MatrixType)
+        self.assertEqual(expr.expression, 'add(x, y)+(add(1, 2))')
+
     def test_eval_method(self):
         cube = MatrixType(x**3 for x in MatrixType)
         self.assertEqual(27, cube.eval(3))
@@ -155,12 +167,6 @@ class ExpressionTest(unittest.TestCase):
         """The MatrixType() instance shoud have the __name__ property."""
         named_lambda = MatrixType(+x for x in MatrixType)
         self.assertEqual(named_lambda.__name__, 'named_lambda')
-
-    def test_CallableObject_string(self):
-        """Should make a correct code if use some CallableObject object."""
-        double = MatrixType(x*2 for x in MatrixType)
-        expr = MatrixType(double(y) for y in MatrixType)
-        self.assertEqual(expr.expression, 'double(y)')
 
 
 class TestBinaryRelation(unittest.TestCase):

@@ -258,7 +258,7 @@ class NamedObject:
             return name
 
 
-class CalledObject:
+class CalledObject(ExpressionString):
     """This object is created when you call the the function."""
     def __init__(self, generator, name, args):
         self._generator = generator
