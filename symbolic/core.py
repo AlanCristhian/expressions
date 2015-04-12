@@ -110,8 +110,8 @@ def _binary_right_operator(template):
 
 
 def _unary_operator(template):
-    """Return a function that make an expression
-    string with an unary operator."""
+    """Return a function that make an expression string with an
+    unary operator."""
     def operator(self):
         result = ExpressionString()
         result.expression = template % self.expression
@@ -325,15 +325,18 @@ class CallableObject(NamedObject):
         return next(self(*args))
 
 
-# Make a matrix
-# =============
+"""
+Make a matrix
+=============
 
-# Now supose that I wish to define a matrix with the sintax:
-# >> A = Any**3*4
-# The `A` object is a matrix with 3 rows and 4 columns. The
-# `MatrixType.__mul__()` method set such feature to the object created
-# with the `Any**3` expression. In te example `Any` is an subclass of
-# `MatrixType`.
+Now, supose that I wish to define a matrix with the sintax:
+
+>>> A = Real**3*4
+
+The `A` object is a matrix with 3 rows and 4 columns. The
+`MatrixType.__mul__()` method set such feature to the object created
+with the `Real**3` expression.
+"""
 
 class MatrixType(CallableObject, metaclass=IterableAndVectorMeta):
     """Add `NumericType**M*N` API interface to make an MxN matrix with
