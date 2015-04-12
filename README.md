@@ -67,8 +67,46 @@ Also you can do early evaluation with the `.eval()` method:
 -8
 ```
 
+### Domain of a function (not yet implemented)
 
-## System of equalities
+You can define the domain of a function. E.g: `D` is cilinder with
+`height = 2` and `radius = 1` and is paralell to `z` axis:
+
+`D = {(x, y, z) ∀ (x, y, z) ∊ ℝ³ | 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
+
+Is translated to Python3 as:
+
+```python
+D = Domain([0 <= x <= 2, 0 <= y**2 + z**2 <= 1] for (x, y, z) in Real**3)
+```
+
+### Range of a function (not yet implemented)
+
+Also you can define the range of a function. E.g:
+
+`R = {(x, y, z) ∀ (x, y, z) ∊ ℝ³ | 0 ≤ x ≤ 2, 0 < y < 2, 2 > z > -2 }`
+
+Is translated to Python3 as:
+
+```python
+R = Range([0 <= x <= 2, 0 < y <= 2, 2 > z > -2] for (x, y, z) in Real**3)
+```
+
+### Precondition and postcondition in a function (not yet implemented)
+
+Supose that you want to validate the input and output of a function. You
+can use the domain and range to do that.
+
+```python
+my_domain = Domain([-1 < x < 1, -1 < y < 1] for (x, y) in Real**2)
+my_range = Range([-2 < z < 2] for z in Real)
+function = my_range(x + y for (x, y) in my_domain)
+```
+
+The `function` object check that the argument meet the condition described
+in `my_domain` and theck that their result is between -2 and 2.
+
+## System of equalities (not yet implemented)
 
 ```python
 >>> from symbolic import System, Real
@@ -79,17 +117,4 @@ Also you can do early evaluation with the `.eval()` method:
 ...         for (x1, x2, x3) in Real**3)
 >>> system.solve()
 (BinaryRelation(x1 == 0.0), BinaryRelation(x2 == -1.0), BinaryRelation(x3 == -2.0))
-```
-
-## Domain of a function (not yet implemented)
-
-The you can define the domain of a function. E.g: `D` is cilinder with
-`height = 2` and `radius = 1` and is paralell to `z` axis:
-
-`D = {(x, y, z) ∀ (x, y, z) ∊ ℝ³ | 0 ≤ x ≤ 2, 0 ≤ y² + z² ≤ 1}`
-
-Is translated to Python3 as:
-
-```python
-D = Domain((x, y, z) for (x, y, z) in Real**3 if 0 <= x <= 2 if 0 <= y**2 + z**2 <= 1)
 ```
