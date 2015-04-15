@@ -32,9 +32,11 @@ So, I want to have an str with the `output expression` of the
 """
 
 
-_BINARY_LEFT_OPERATOR = [
+_LEFT_OPERATOR = [
     ('__add__', '%s+(%s)'),
-    ('__and__', '%s&(%s)'),
+    # This operator is special, is used with the where object. See the
+    # comment in the __new__ method of the _DefineAllOperatorsMeta class.
+    # ('__and__', '%s&(%s)'),
     ('__div__', '%s/(%s)'),
     ('__eq__', '%s==(%s)'),
     ('__floordiv__', '%s//(%s)'),
@@ -55,7 +57,7 @@ _BINARY_LEFT_OPERATOR = [
     ('__xor__', '%s^(%s)'),
 ]
 
-_BINARY_RIGHT_OPERATOR = [
+_RIGHT_OPERATOR = [
     ('__radd__', '(%s)+%s'),
     ('__rand__', '(%s)&%s'),
     ('__rdiv__', '(%s)/%s'),
@@ -79,7 +81,7 @@ _UNARY_OPERATOR = [
 ]
 
 
-def _binary_left_operator(template):
+def _left_operator(template):
     """Return a function that make an expression string with a binary
     left operator."""
     def operator(self, other):
@@ -94,7 +96,7 @@ def _binary_left_operator(template):
     return operator
 
 
-def _binary_right_operator(template):
+def _right_operator(template):
     """Return a function that make an expression string with an
     binary operator placed at the right of the variable."""
     def operator(self, other):
@@ -119,16 +121,37 @@ def _unary_operator(template):
     return operator
 
 
+
+class where(dict):
+    def __rand__(self, other):
+        return [self, other]
+
+
+def _matrix_multiplication_operator(self, other):
+    if type(other) is where:
+        return self
+    else:
+        result = _left_operator('%s&(%s)')
+        return result(self, other)
+
+
 class _DefineAllOperatorsMeta(type):
     """All operators of the new class will return an string that
     represent the mathematical expression."""
     def __new__(cls, name, bases, namespace):
-        namespace.update({function: _binary_left_operator(template) for \
-                          function, template in _BINARY_LEFT_OPERATOR})
-        namespace.update({function: _binary_right_operator(template) for \
-                          function, template in _BINARY_RIGHT_OPERATOR})
+        namespace.update({function: _left_operator(template) for \
+                          function, template in _LEFT_OPERATOR})
+        namespace.update({function: _right_operator(template) for \
+                          function, template in _RIGHT_OPERATOR})
         namespace.update({function: _unary_operator(template) for \
                           function, template in _UNARY_OPERATOR})
+
+        # CAVEAT: I use the matrix multiplication operator to introduce
+        # the `where` satement inside the generator. I don't want that
+        # shuch statement will be stored in the `.expression` property
+        # because the where object is used to inject constanst in the
+        # generator.
+        namespace.update({'__and__': _matrix_multiplication_operator})
         new_class = super().__new__(cls, name, bases, namespace)
         return new_class
 
@@ -296,6 +319,7 @@ class CallableObject(NamedObject):
         super().__init__()
         self._generator = generator
         self._send = self._generator.gi_frame.f_locals['.0'].send
+        self._var_names = self._generator.gi_code.co_varnames[1:]
 
     def _make_expression(self):
         """Send an ExpressionString() object to the generator. Then
@@ -303,8 +327,7 @@ class CallableObject(NamedObject):
         # CAVEAT: everything the first var name in gi_code.co_varnames is "0.0"
         # This is the name of the iterator used in the first *for* statement
         # in the generator.
-        expr_obj = self(*(ExpressionString(name)
-            for name in self._generator.gi_code.co_varnames[1:]))
+        expr_obj = self(*(ExpressionString(name) for name in self._var_names))
         return next(expr_obj)
 
     @utils.cached_property
