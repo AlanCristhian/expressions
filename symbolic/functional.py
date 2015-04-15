@@ -88,9 +88,13 @@ def inject_constants(generator, **constants):
                         _pairwise(gi_code.co_consts) if _key == name
                     )
                     # remove the variable from the local namespace and ...
-                    new_locals.pop(_new_key)
+                    del new_locals[_new_key]
                     # ... add such variable to the constants dictionary
                     constants.update({_new_key: _new_value})
+
+            if name in new_locals:
+                constants.update({name: new_locals[name]})
+                del new_locals[name]
 
             if name in constants:
                 value = constants[name]
@@ -108,8 +112,6 @@ def inject_constants(generator, **constants):
                     # I clear this names because if not the generator can't
                     # compile.
                     new_freevars.remove(name)
-                    if name in new_locals:
-                        del new_locals[name]
                 new_code[i] = OPMAP_LOAD_CONST
                 new_code[i + 1] = pos & 0xFF
                 new_code[i + 2] = pos >> 8
@@ -121,7 +123,6 @@ def inject_constants(generator, **constants):
     # is a custom version of the original object
 
     # new_freevars = [var for var in new_freevars if var != 'a_local']
-    # new_locals = {key: value for key, value in new_locals.items() if key != 'a_local'}
     # new_names.append('a_local')
 
     if '_' in gi_code.co_varnames:

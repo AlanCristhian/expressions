@@ -81,23 +81,19 @@ class TestFunction(unittest.TestCase):
             &where (
                 a_local = 'AA',
                 b_local = 'BB',
-            ) for _ in Parameters)
+            ) for x in Parameters)
 
-        expected = "def function(_):\n"\
+        expected = "def function(x):\n"\
                    "    yield 'AABB'"
         self.assertEqual(function.__source__, expected)
 
     def test_where_class_with_non_local_variables(self):
+        # NOTE: the value of this variable should be different than the name
         non_local = '_nnnnnnn'
-
-        function = Function(
-            a_local+non_local
-            &where (
-                a_local = 'AA',
-            ) for _ in Parameters)
+        function = Function(non_local for _ in Parameters)
 
         expected = "def function(_):\n"\
-                   "    yield 'AA_nnnnnnn'"
+                   "    yield '_nnnnnnn'"
         self.assertEqual(function.__source__, expected)
 
     @unittest.skip('unimplemented')
