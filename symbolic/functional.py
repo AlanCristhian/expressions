@@ -122,28 +122,6 @@ def inject_constants(generator, **constants):
     # NOTE: the lines comented whit the *CUSTOM:* tag mean that such argument
     # is a custom version of the original object
 
-    # new_freevars = [var for var in new_freevars if var != 'a_local']
-    # new_names.append('a_local')
-
-    if '_' in gi_code.co_varnames:
-        print()
-        print('gi_frame.f_locals', generator.gi_frame.f_locals, new_locals)
-        print('gi_code.co_argcount', gi_code.co_argcount)
-        print('gi_code.co_kwonlyargcount', gi_code.co_kwonlyargcount)
-        print('gi_code.co_nlocals', gi_code.co_nlocals)
-        print('gi_code.co_stacksize', gi_code.co_stacksize)
-        print('gi_code.co_flags', gi_code.co_flags)
-        # print('gi_code.co_code', gi_code.co_code)
-        print('gi_code.co_consts', gi_code.co_consts)
-        print('gi_code.co_names', gi_code.co_names, new_names)
-        print('gi_code.co_varnames', gi_code.co_varnames)
-        # print('gi_code.co_filename', gi_code.co_filename)
-        print('gi_code.co_name', gi_code.co_name)
-        print('gi_code.co_firstlineno', gi_code.co_firstlineno)
-        # print('gi_code.co_lnotab', gi_code.co_lnotab)
-        print('gi_code.co_freevars', gi_code.co_freevars, new_freevars)
-        print('gi_code.co_cellvars', gi_code.co_cellvars)
-
     # create a new *code object* (like generator.gi_code)
     code_object = types.CodeType(
         gi_code.co_argcount,
@@ -161,9 +139,6 @@ def inject_constants(generator, **constants):
         gi_code.co_lnotab,
         tuple(new_freevars),        # CUSTOM: generator.gi_code.co_freevars
         gi_code.co_cellvars)
-
-    if '_' in gi_code.co_varnames:
-        print(dis.dis(code_object))
 
     # Customize the argument of the function object
     _code    = code_object
