@@ -5,6 +5,7 @@ from symbolic.core import where
 
 
 _GLOBAL = 'GLOBAL'
+_GLOBAL_2 = 9999
 
 
 class TestWhere(unittest.TestCase):
@@ -95,6 +96,31 @@ class TestFunction(unittest.TestCase):
         expected = "def function(_):\n"\
                    "    yield '_nnnnnnn'"
         self.assertEqual(function.__source__, expected)
+
+    def test_where_class_with_non_local_global_and_local_variables(self):
+        # NOTE: the value of this variable should be different than the name
+        non_local = '_nnnnnnn'
+        local = '_lllllll'
+        function_1 = Function(
+            non_local+_GLOBAL+local
+            &where(
+                local = '_local'
+            ) for _ in Parameters)
+
+        expected_1 = "def function(_):\n"\
+                   "    yield '_nnnnnnnGLOBAL_local'"
+        non_local = 1111
+        local = 2222
+        function_2 = Function(
+            non_local+_GLOBAL_2+local
+            &where(
+                local = 3333
+            ) for _ in Parameters)
+
+        expected_2 = "def function(_):\n"\
+                   "    yield 14443"
+        self.assertEqual(function_1.__source__, expected_1)
+        self.assertEqual(function_2.__source__, expected_2)
 
     @unittest.skip('unimplemented')
     def test_where_class_in_the_begining_of_the_expression(self):
