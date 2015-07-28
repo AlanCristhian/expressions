@@ -1,6 +1,6 @@
 # symbolic
 
-An experimental library that allow your define mathematical expressions.
+An experimental library that let your define mathematical expressions.
 
 ## Matrix definition
 
@@ -106,7 +106,7 @@ function = my_range(x + y for (x, y) in my_domain)
 The `function` object check that the argument meet the condition described
 in `my_domain` and theck that their result is between -2 and 2.
 
-## System of equalities (not yet implemented)
+## System of equalities
 
 ```python
 >>> from symbolic import System, Real
@@ -116,5 +116,14 @@ in `my_domain` and theck that their result is between -2 and 2.
 ...     9*x1 + 10*x2 - 11*x3 == 12]
 ...         for (x1, x2, x3) in Real**3)
 >>> system.solve()
-(BinaryRelation(x1 == 0.0), BinaryRelation(x2 == -1.0), BinaryRelation(x3 == -2.0))
+[1 == 0.0, x2 == -1.0, x3 == -2.0]
+```
+
+## System of inequalities
+
+```python
+>>> from symbolic import System, Real
+>>> system = System(2 - 3*x < 7 for x in in Real)
+>>> system.solve()
+[x > 1.666667]
 ```
