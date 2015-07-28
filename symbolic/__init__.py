@@ -16,10 +16,14 @@ class System(core.CallableObject):
     equalities."""
     def __init__(self, system, *args, **kwds):
         super().__init__(system, *args, **kwds)
-        self.expression = super()._make_expression()
+        self.__expr__ = super()._make_expression()
 
     def __setitem__(self, key, value):
         return self._array.__setitem__(key, value)
 
     def __repr__(self):
         return 'System(%s)' % repr(self._array)
+
+
+class Real(metaclass=core.IterableMeta):
+    pass
