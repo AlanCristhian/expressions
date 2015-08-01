@@ -212,6 +212,11 @@ class ExpressionSuite(unittest.TestCase):
 
     # Attribute and item access
 
+    # def test__getattr__method(self):
+    #     self.assertEqual(self.var.attribute.__expr__, '(self.var).attribute')
+    #     attribute = getattr(self.var, 'attribute')
+    #     self.assertEqual(attribute.__expr__, '(self.var).attribute')
+
     def test__getitem__method(self):
         self.assertEqual(self.var[1].__expr__, "(var)[1]")
         self.assertEqual(self.var[1, 2].__expr__, "(var)[(1, 2)]")

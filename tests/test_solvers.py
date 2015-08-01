@@ -5,14 +5,6 @@ from symbolic import core
 import symbolic
 
 
-class TestExpressionMatrix(unittest.TestCase):
-    def test_get_expression_list(self):
-        expression = '9*x1 + 10*x2 - 11*x3 == 12'
-        obtained = solvers.get_expression_list(expression)
-        expected = ['9*x1', '+10*x2', '-11*x3', '==', '12']
-        self.assertEqual(obtained, expected)
-
-
 class TestCoefficientMatrix(unittest.TestCase):
     def test_get_independent_term_vector(self):
         expr_list = [
@@ -39,6 +31,23 @@ class TestCoefficientMatrix(unittest.TestCase):
         obtained = solvers.expanded_coefficients_matrix(system)
         self.assertEqual(obtained, expected)
 
+    def test_expanded_coefficients_matrix_of_rectangular_system(self):
+        system = symbolic.System([
+              -x1 +  2*x2 -  3*x3 ==  4,
+             5*x1 -  6*x2 +  7*x3 == -8,
+             9*x1 + 10*x2 - 11*x3 ==  12,
+            13*x1 - 14*x2 + 15*x3 == -16]
+                for (x1, x2, x3) in symbolic.Any)
+
+        matrix = [[-1,   2,  -3,   4],
+                  [ 5,  -6,   7,  -8],
+                  [ 9,  10, -11,  12],
+                  [13, -14,  15, -16]]
+        expected = matrix, [core.Eq]*4
+
+        obtained = solvers.expanded_coefficients_matrix(system)
+        self.assertEqual(obtained, expected)
+
     def test_unsorted_expanded_coefficients_matrix(self):
         """Should extract all coefficients of an unsorted system of linear
         equalities."""
@@ -49,8 +58,8 @@ class TestCoefficientMatrix(unittest.TestCase):
                 for (x1, x2, x3) in symbolic.Any)
 
         matrix = [[-1,  2,  -3,  4],
-                    [ 5, -6,   7, -8],
-                    [ 9, 10, -11, 12]]
+                  [ 5, -6,   7, -8],
+                  [ 9, 10, -11, 12]]
         expected = matrix, [core.Eq]*3
 
         obtained = solvers.expanded_coefficients_matrix(system)
@@ -82,8 +91,8 @@ class TestSolver(unittest.TestCase):
         self.assertAlmostEqual(r[2].right, -2.0)
 
     def test_solve_inequality(self):
-        system = symbolic.System(2 - 3*x < 7 for x in symbolic.Any)
-        expected = core.Gt("x", -5/3)
+        system = symbolic.System([b == g, -1 < g, g < r, -1 < r, r < 256]
+                                 for (r, g, b) in symbolic.Any)
         obtained = solvers.solve(system)
         self.assertAlmostEqual(obtained, expected)
 

@@ -196,6 +196,11 @@ class Expression(metaclass=_Operators):
     def __repr__(self):
         return self.__expr__
 
+    # def __getattr__(self, attr):
+    #     result = Expression("")
+    #     result.__expr__ = '(%s).%s' % (self.__expr__, attr)
+    #     return result
+
     def __getitem__(self, attr):
         result = Expression("")
         result.__expr__ = '(%s)[%r]' % (self.__expr__, attr)
