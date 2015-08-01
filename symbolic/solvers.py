@@ -64,29 +64,29 @@ def expanded_coefficients_matrix(system):
     D = N - M
 
     identity_matrix = \
-        [['1' if i == j else '0' for i in range(N)] for j in range(N)]
+        [['1' if i == j else '0' for i in range(M)] for j in range(M)]
 
     indepentent_terms = get_independent_term_vector(expression_list, var_names)
 
-    coeff_column_expr = []
+    coefficients_rows = []
     for expression,independent_term in zip(expression_list, indepentent_terms):
-        coeff_row_expr = []
+        coefficients = []
         for row in identity_matrix:
             coeff_expr = expression
             for value, name in zip(row, var_names):
                 coeff_expr = coeff_expr.replace(name, value)
-            coeff_row_expr.append(coeff_expr + '-%s' % independent_term)
-        coeff_row_expr.append('-%s' % independent_term)
-        coeff_column_expr.append(coeff_row_expr)
+            coefficients.append(coeff_expr + '-%s' % independent_term)
+        coefficients.append('-%s' % independent_term)
+        coefficients_rows.append(coefficients)
 
     if D > 0:
         unknown = {name: core.Expression(name) for name in var_names[D:]}
         # Make and return the expanded coefficients matrix
         result = [[eval(item, None, unknown) for item in row]
-                   for row in coeff_column_expr]
+                   for row in coefficients_rows]
     else:
         # Make and return the expanded coefficients matrix
-        result = [[eval(item) for item in row] for row in coeff_column_expr]
+        result = [[eval(item) for item in row] for row in coefficients_rows]
     return result, operator_list
 
 
